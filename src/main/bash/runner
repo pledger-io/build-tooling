@@ -1,0 +1,11 @@
+#!/bin/sh
+
+echo "Starting FinTrack application"
+
+if [[ -z "${DB_TYPE}" ]]; then
+    DB_TYPE=h2
+fi;
+
+JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${DB_TYPE} -Dmicronaut.server.host=0.0.0.0"
+
+sh /opt/fintrack/bin/fintrack-deployment

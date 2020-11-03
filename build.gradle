@@ -1,0 +1,56 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
+    }
+}
+
+plugins {
+    id "io.micronaut.application" version '1.1.0'
+}
+
+apply plugin: 'io.micronaut.application'
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        mavenContent{
+            snapshotsOnly()
+        }
+    }
+}
+
+micronaut {
+    version "$micronautVersion"
+    runtime "jetty"
+    testRuntime "junit5"
+    processing {
+        incremental true
+        annotations "com.jongsoft.finance"
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion('15')
+    targetCompatibility = JavaVersion.toVersion('15')
+}
+
+mainClassName = "com.jongsoft.finance.Application"
+
+// Setup the java execution process
+tasks.withType(JavaExec) {
+    classpath += configurations.developmentOnly
+    jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote', '--enable-preview')
+}
+
+// Setup the dependencies for the wrapper build
+dependencies {
+    implementation "com.jongsoft.finance:fintrack-api:$version"
+    implementation "com.jongsoft.finance:fintrack-ui:$version"
+}
