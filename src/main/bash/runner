@@ -8,4 +8,4 @@ fi;
 
 JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${DB_TYPE} -Dmicronaut.server.host=0.0.0.0"
 
-sh /opt/fintrack/bin/fintrack-deployment
+sh /opt/fintrack/bin/fintrack
