@@ -5,7 +5,7 @@ pipelines:
         script:
           - bash ./gradlew build
         artifacts:
-          - build/distribution/*.tar
+          - build/distributions/*.tar
 
   tags:
     release-*:
@@ -13,8 +13,6 @@ pipelines:
           name: Bundling software
           script:
             - bash ./gradlew build
-          artifacts:
-            - build/distribution/*.tar
       - parallel:
           - step:
               name: Building AMD-64 image
