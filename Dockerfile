@@ -20,11 +20,11 @@ ARG BUILD_VERSION
 
 COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
 COPY src/main/bash/runner /opt/fintrack/runner
-COPY build/distributions/fintrack-deployment-${BUILD_VERSION}.tar /opt/fintrack-${BUILD_VERSION}.tar
+COPY build/distributions/fintrack-*.tar /opt/fintrack-${BUILD_VERSION}.tar
 
 RUN \
     tar -xf /opt/fintrack-${BUILD_VERSION}.tar \
-    && mv /opt/fintrack-deployment-${BUILD_VERSION}/* /opt/fintrack/ \
+    && mv /opt/fintrack-${BUILD_VERSION}/* /opt/fintrack/ \
     && rm -rf /opt/fintrack-*
 
 # Correct the working directory
