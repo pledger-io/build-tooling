@@ -15,10 +15,11 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew build installDist
+            - bash ./gradlew build
           artifacts:
             - build/distributions/*.tar
-            - build/install
+            - build/layers/libs/*.jar
+            - build/scripts
       - parallel:
         - step:
             name: Building AMD-64 image

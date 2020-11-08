@@ -1,6 +1,7 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
+ARG BUILD_VERSION
 LABEL \
     maintainer="g.jongerius@jong-soft.com" \
     description="FinTrack ${BUILD_VERSION}, a self hosted financial application" \
@@ -16,8 +17,6 @@ ENV JAVA_OPTS="--enable-preview -Dmicronaut.application.storage.location=/opt/st
 WORKDIR /opt
 
 # Setup application in the container
-ARG BUILD_VERSION
-
 COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
 COPY src/main/bash/runner /opt/fintrack/runner
 COPY build/distributions/fintrack-*.tar /opt/fintrack-${BUILD_VERSION}.tar

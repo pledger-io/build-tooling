@@ -4,6 +4,18 @@ const fs = require('fs');
 let window;
 let mainWindow;
 let serverProcess;
+const killHandler = function() {
+    if (serverProcess) {
+        const kill = require('tree-kill');
+        kill(serverProcess.pid, 'SIGTERM', function () {
+            console.log('Server process killed');
+            serverProcess = null;
+            app.quit();
+        });
+    } else {
+        app.quit();
+    }
+};
 
 const appBasePath = process.cwd();
 const backendUrl = 'http://localhost:8080';
@@ -15,71 +27,75 @@ console.log('Setting up application with known paths: ')
 console.log(`  root: ${appBasePath}`);
 console.log(`  serverStorage: ${serverStorage}`);
 console.log(`  serverLog: ${serverLog}`);
-console.log(`  serverLibrary: ${serverPath}`);
+console.log(`  serverPath: ${serverPath}`);
 
 function startServer(callback) {
-    const killServer = function() {
-        if (serverProcess) {
-            const kill = require('tree-kill');
-            kill(serverProcess.pid, 'SIGTERM', function () {
-                console.log('Server process killed');
-                serverProcess = null;
-            });
-        }
-    }
-
     const serverOutput = fs.createWriteStream(serverLog);
+    const libSeparator = process.platform === 'win32' ? ';' : ':';
     const dataLogger = function(data) {
-        console.debug(`Server output: ${data}`);
         serverOutput.write(`${data}`);
     }
 
     try {
-        serverProcess = require('child_process')
-            .spawn('java',
-                [
-                    '--enable-preview',
-                    '-cp', `${serverPath}/*;${serverPath}/lib/*`,
-                    `-Dmicronaut.application.storage.location=${serverStorage}`,
-                    'com.jongsoft.finance.Application'
-                ],
-                {
-                    cwd: appBasePath + '/fintrack',
-                    env: {
-                        MICRONAUT_ENVIRONMENTS: 'h2'
-                    },
-                    shell: true
-                });
+        fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${serverStorage}/rsa-2048bit-key-pair.pem`);
+        fs.readdir(`${serverPath}/core/`, (err, files) => {
+            let domainJar = files.filter(file => file.indexOf('domain-') > -1)[0];
+            let versionMatch = /domain-([\w.\-]+)\.jar/.exec(domainJar)[1];
 
-        serverProcess.stdout.on('data', dataLogger);
-        serverProcess.stderr.on('data', dataLogger);
+            const coreJars = [
+                `${serverPath}/core/fintrack-api-${versionMatch}.jar`,
+                `${serverPath}/core/fintrack-ui-${versionMatch}.jar`,
+                `${serverPath}/core/jpa-repository-${versionMatch}.jar`,
+                `${serverPath}/core/bpmn-process-${versionMatch}.jar`,
+                `${serverPath}/core/rule-engine-${versionMatch}.jar`,
+                `${serverPath}/core/domain-${versionMatch}.jar`,
+                `${serverPath}/core/core-${versionMatch}.jar`,
+            ].join(libSeparator);
+
+            serverProcess = require('child_process')
+                .spawn('java',
+                    [
+                        '--enable-preview',
+                        '-cp', `${coreJars}${libSeparator}${serverPath}/libs/*`,
+                        `-Dmicronaut.application.storage.location=${serverStorage}`,
+                        'com.jongsoft.finance.Application'
+                    ],
+                    {
+                        cwd: appBasePath + '/fintrack',
+                        env: {
+                            MICRONAUT_ENVIRONMENTS: 'h2'
+                        },
+                        shell: true
+                    });
+
+            serverProcess.stdout.on('data', dataLogger);
+            serverProcess.stderr.on('data', dataLogger);
+
+            callback(serverProcess != null);
+        });
     } catch (e) {
         console.log(e);
-        serverProcess = null;
+        callback(false);
     }
-
-    callback(serverProcess != null, killServer);
 }
 
-const waitForServer = function (executionCount, killHandler, startHandler) {
+const waitForServer = function (executionCount, startHandler) {
     const requestPromise = require('minimal-request-promise');
 
     requestPromise.get(backendUrl).then(function (response) {
         console.log('Server started!');
         startHandler();
     }, function (response) {
-        console.log(executionCount + ' - Waiting for the server start...');
-        if (executionCount > 15) {
-            console.log('Unable to start the server correctly')
+        if (executionCount > 5) {
             mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
             setTimeout(() => {
                 killHandler();
                 app.quit();
             }, 1500);
         } else {
-            setTimeout(function () {
-                waitForServer(executionCount + 1, killHandler, startHandler);
-            }, 200);
+            setTimeout(() => {
+                waitForServer(executionCount + 1, startHandler);
+            }, 5000);
         }
     });
 };
@@ -87,10 +103,14 @@ const waitForServer = function (executionCount, killHandler, startHandler) {
 function initializeApplication() {
     mainWindow = new BrowserWindow({
         title: 'FinTrack: Personal Finance Manager',
-        width: 800,
-        height: 600,
+        width: 1024,
+        height: 786,
         autoHideMenuBar: true
     });
+    mainWindow.on('close', function(e){
+        mainWindow = null;
+        killHandler();
+    })
     mainWindow.loadFile(`${appBasePath}/resources/index.html`);
 
     startServer(function (success, killHandler) {
@@ -101,15 +121,7 @@ function initializeApplication() {
         } else {
             waitForServer(
                 0,
-                killHandler,
-                function () {
-                    mainWindow.loadURL(backendUrl);
-                    mainWindow.on('close', function(e){
-                        e.preventDefault();
-                        mainWindow.close();
-                        killHandler();
-                    });
-                });
+                () => mainWindow.loadURL(backendUrl));
         }
     });
 }

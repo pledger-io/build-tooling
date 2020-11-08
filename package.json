@@ -44,8 +44,8 @@
     ],
     "extraFiles": [
       {
-        "from": "build/install/fintrack/lib",
-        "to": "./fintrack/lib",
+        "from": "build/layers/libs",
+        "to": "./fintrack/libs",
         "filter": [
           "!fintrack-api*.jar",
           "!fintrack-ui*.jar",
@@ -56,8 +56,8 @@
         ]
       },
       {
-        "from": "build/install/fintrack/lib",
-        "to": "./fintrack",
+        "from": "build/layers/libs",
+        "to": "./fintrack/core",
         "filter": [
           "fintrack-api*.jar",
           "fintrack-ui*.jar",
@@ -73,6 +73,11 @@
         "from": "src/main/electron",
         "to": ".",
         "filter": "*.html"
+      },
+      {
+        "from": "src/main",
+        "to": "../fintrack/",
+        "filter": ["rsa-2048bit-key-pair.pem"]
       }
     ]
   },

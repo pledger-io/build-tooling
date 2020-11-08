@@ -43,7 +43,7 @@ node {
 }
 
 task buildElectron (type: NpxTask) {
-    dependsOn installDist, npmInstall
+    dependsOn build, npmInstall
 
     command = 'electron-builder'
     args = ["-lw"]
