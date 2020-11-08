@@ -44,12 +44,28 @@
     ],
     "extraFiles": [
       {
-        "from": "build/install/fintrack/bin",
-        "to": "./fintrack/bin"
+        "from": "build/install/fintrack/lib",
+        "to": "./fintrack/lib",
+        "filter": [
+          "!fintrack-api*.jar",
+          "!fintrack-ui*.jar",
+          "!rule-engine*.jar",
+          "!domain*.jar",
+          "!jpa-repository*.jar",
+          "!bpmn-process*.jar"
+        ]
       },
       {
         "from": "build/install/fintrack/lib",
-        "to": "./fintrack/lib"
+        "to": "./fintrack",
+        "filter": [
+          "fintrack-api*.jar",
+          "fintrack-ui*.jar",
+          "rule-engine*.jar",
+          "domain*.jar",
+          "jpa-repository*.jar",
+          "bpmn-process*.jar"
+        ]
       }
     ],
     "extraResources": [

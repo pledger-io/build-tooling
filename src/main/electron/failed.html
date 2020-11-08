@@ -1,6 +1,15 @@
 <html>
 <head>
     <style>
+        #loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background: #222;
+        }
         #loading-text {
             color: white;
             text-align: center;
@@ -14,7 +23,6 @@
 
         #loading-text p {
             font-size: 22px;
-            margin-top: 20vh;
             line-height: 100vh;
         }
     </style>
@@ -22,7 +30,7 @@
 <body>
 
     <div id="loader-wrapper">
-        <div id="loading-text"><p>Failed to load application.</p></div>
+        <div id="loading-text"><p>Failed to load application. This window will close automatically.</p></div>
     </div>
 
 </body>

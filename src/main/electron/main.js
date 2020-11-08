@@ -2,19 +2,20 @@ const {app, BrowserWindow} = require('electron');
 const fs = require('fs');
 
 let window;
+let mainWindow;
 let serverProcess;
 
 const appBasePath = process.cwd();
 const backendUrl = 'http://localhost:8080';
 const serverStorage = `${app.getPath('appData')}/${app.getName()}/FinTrack/storage/`;
 const serverLog = app.getPath('logs') + '/server.log';
-const serverLibPath = `${appBasePath}/fintrack/lib`;
+const serverPath = `${appBasePath}/fintrack`;
 
 console.log('Setting up application with known paths: ')
 console.log(`  root: ${appBasePath}`);
 console.log(`  serverStorage: ${serverStorage}`);
 console.log(`  serverLog: ${serverLog}`);
-console.log(`  serverLibrary: ${serverLibPath}`);
+console.log(`  serverLibrary: ${serverPath}`);
 
 function startServer(callback) {
     const killServer = function() {
@@ -33,41 +34,31 @@ function startServer(callback) {
         serverOutput.write(`${data}`);
     }
 
-    console.log('Attempting to read in the classpath from ' + serverLibPath)
-    fs.readdir(serverLibPath, (err, files) => {
-        try {
-            let javaClasspath = '';
-            files.forEach(function(file) {
-                if (javaClasspath !== '') {
-                    javaClasspath = `${javaClasspath};`;
-                }
+    try {
+        serverProcess = require('child_process')
+            .spawn('java',
+                [
+                    '--enable-preview',
+                    '-cp', `${serverPath}/*;${serverPath}/lib/*`,
+                    `-Dmicronaut.application.storage.location=${serverStorage}`,
+                    'com.jongsoft.finance.Application'
+                ],
+                {
+                    cwd: appBasePath + '/fintrack',
+                    env: {
+                        MICRONAUT_ENVIRONMENTS: 'h2'
+                    },
+                    shell: true
+                });
 
-                javaClasspath = `${javaClasspath}${serverLibPath}/${file}`;
-            })
+        serverProcess.stdout.on('data', dataLogger);
+        serverProcess.stderr.on('data', dataLogger);
+    } catch (e) {
+        console.log(e);
+        serverProcess = null;
+    }
 
-            serverOutput.write(`Starting server with classpath "${javaClasspath}"`);
-            serverProcess = require('child_process')
-                .spawn('java',
-                    [
-                        '-cp', `"${javaClasspath}"`,
-                        '-Dmicronaut.environments=h2',
-                        `-Dmicronaut.application.storage.location=${serverStorage}`,
-                        '--enable-preview',
-                        'com.jongsoft.finance.Application'
-                    ],
-                    {
-                        cwd: appBasePath + '/fintrack'
-                    });
-
-            serverProcess.stdout.on('data', dataLogger);
-            serverProcess.stderr.on('data', dataLogger);
-        } catch (e) {
-            console.log(e);
-            serverProcess = null;
-        }
-
-        callback(serverProcess != null, killServer);
-    });
+    callback(serverProcess != null, killServer);
 }
 
 const waitForServer = function (executionCount, killHandler, startHandler) {
@@ -78,11 +69,13 @@ const waitForServer = function (executionCount, killHandler, startHandler) {
         startHandler();
     }, function (response) {
         console.log(executionCount + ' - Waiting for the server start...');
-        if (executionCount > 3) {
+        if (executionCount > 15) {
             console.log('Unable to start the server correctly')
-            killHandler();
-            app.quit();
-            return;
+            mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
+            setTimeout(() => {
+                killHandler();
+                app.quit();
+            }, 1500);
         } else {
             setTimeout(function () {
                 waitForServer(executionCount + 1, killHandler, startHandler);
@@ -92,7 +85,7 @@ const waitForServer = function (executionCount, killHandler, startHandler) {
 };
 
 function initializeApplication() {
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         title: 'FinTrack: Personal Finance Manager',
         width: 800,
         height: 600,

@@ -53,6 +53,6 @@ task buildElectron (type: NpxTask) {
 
 // Setup the dependencies for the wrapper build
 dependencies {
-    implementation "com.jongsoft.finance:fintrack-api:$version"
-    implementation "com.jongsoft.finance:fintrack-ui:$version"
+    implementation "com.jongsoft.finance:fintrack-api:$apiVersion"
+    implementation "com.jongsoft.finance:fintrack-ui:$angularVersion"
 }
