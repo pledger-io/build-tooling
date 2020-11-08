@@ -3,38 +3,42 @@ pipelines:
     - step:
         name: Bundling software
         script:
-          - bash ./gradlew build
+          - bash ./gradlew build installDist
         artifacts:
           - build/distributions/*.tar
+          - build/install
 
   branches:
     release/*:
       - step:
           name: Bundling software
+          caches:
+            - gradle
           script:
-            - bash ./gradlew build
+            - bash ./gradlew build installDist
           artifacts:
             - build/distributions/*.tar
-#      - parallel:
-      - step:
-          name: Building AMD-64 image
-          services:
-            - docker
-          script:
-            - export `grep version gradle.properties`
-            - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-            - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:15-oracle --build-arg BUILD_VERSION=$version .
-            - docker push gjong/amd64-fintrack:$version
-#          - step:
-#              name: Building armhf image
-#              services:
-#                - docker
-#              script:
-#                - export `grep version gradle.properties`
-#                - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-#                - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-#                - docker build -t gjong/armhf-fintrack:$version --build-arg BASE_IMAGE=arm64v8/openjdk:15 --build-arg BUILD_VERSION=$version .
-#                - docker push gjong/armhf-fintrack:$version
+            - build/install
+      - parallel:
+        - step:
+            name: Building AMD-64 image
+            services:
+              - docker
+            script:
+              - export `grep version gradle.properties`
+              - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+              - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:15-oracle --build-arg BUILD_VERSION=$version .
+              - docker push gjong/amd64-fintrack:$version
+        - step:
+            name: Building standalone
+            caches:
+              - gradle
+              - node
+            script:
+              - bash ./gradlew buildElectron
+            artifacts:
+              - build/bundle/*.exe
+              - build/bundle/*.snap
 
 definitions:
   services:

@@ -1,0 +1,71 @@
+{
+  "name": "fintrack-electron-app",
+  "version": "2.0.0",
+  "description": "FinTrack desktop application",
+  "main": "src/main/electron/main.js",
+  "author": "JongSoft Development",
+  "license": "MIT",
+  "scripts": {
+    "postinstall": "install-app-deps",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.jongsoft.finance",
+    "productName": "FinTrack",
+    "copyright": "Copyright 2020 JongSoft Development",
+    "win": {
+      "target": "nsis",
+      "icon": "src/main/electron/icon.png"
+    },
+    "snap": {
+      "confinement": "strict",
+      "summary": "FinTrack: Your personal finance management helper",
+      "grade": "stable",
+      "stagePackages": [
+        "opendjk-15-jre"
+      ],
+      "plugs": [
+        "network-bind",
+        "desktop"
+      ]
+    },
+    "directories": {
+      "buildResources": "build/electron",
+      "output": "build/bundle"
+    },
+    "files": [
+      "src/main/electron/*",
+      "**/node_modules/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin"
+    ],
+    "extraFiles": [
+      {
+        "from": "build/install/fintrack/bin",
+        "to": "./fintrack/bin"
+      },
+      {
+        "from": "build/install/fintrack/lib",
+        "to": "./fintrack/lib"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "src/main/electron",
+        "to": ".",
+        "filter": "*.html"
+      }
+    ]
+  },
+  "devDependencies": {
+    "electron": "^10.1.5",
+    "electron-builder": "^22.9.1"
+  },
+  "dependencies": {
+    "minimal-request-promise": "^1.5.0",
+    "tree-kill": "^1.2.2"
+  }
+}
