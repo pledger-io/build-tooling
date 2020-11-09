@@ -1,17 +1,17 @@
 const {app, BrowserWindow} = require('electron');
 const fs = require('fs');
 
-let window;
-let mainWindow;
-let serverProcess;
 const killHandler = function() {
     if (serverProcess) {
-        const kill = require('tree-kill');
-        kill(serverProcess.pid, 'SIGTERM', function () {
-            console.log('Server process killed');
-            serverProcess = null;
+        console.debug('Attempting to terminate the Java process.')
+        if (!serverProcess.kill('SIGINT')) {
+            console.warn('Could not terminate Java process, attempting forceful shutdown.');
+            console.log('Force kill response: '+ serverProcess.kill('SIGQUIT'));
             app.quit();
-        });
+        } else {
+            console.debug('Closing application, server terminated.')
+            app.quit();
+        }
     } else {
         app.quit();
     }
@@ -25,18 +25,25 @@ const serverPath = `${appBasePath}/fintrack`;
 
 console.log('Setting up application with known paths: ')
 console.log(`  root: ${appBasePath}`);
-console.log(`  serverStorage: ${serverStorage}`);
-console.log(`  serverLog: ${serverLog}`);
-console.log(`  serverPath: ${serverPath}`);
+console.log(`  server-storage: ${serverStorage}`);
+console.log(`  server-log: ${serverLog}`);
+console.log(`  server-path: ${serverPath}`);
+
+let window;
+let mainWindow;
+let serverProcess;
 
 function startServer(callback) {
     const serverOutput = fs.createWriteStream(serverLog);
     const libSeparator = process.platform === 'win32' ? ';' : ':';
-    const dataLogger = function(data) {
-        serverOutput.write(`${data}`);
-    }
+    const dataLogger = (data) => serverOutput.write(`${data}`);
 
     try {
+        if (!fs.existsSync(serverStorage)) {
+            console.debug('Server storage path was not found, creating new one.');
+            fs.mkdirSync(serverStorage);
+        }
+
         fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${serverStorage}/rsa-2048bit-key-pair.pem`);
         fs.readdir(`${serverPath}/core/`, (err, files) => {
             let domainJar = files.filter(file => file.indexOf('domain-') > -1)[0];
@@ -52,6 +59,7 @@ function startServer(callback) {
                 `${serverPath}/core/core-${versionMatch}.jar`,
             ].join(libSeparator);
 
+            console.debug('Starting backend Java server.')
             serverProcess = require('child_process')
                 .spawn('java',
                     [
@@ -64,8 +72,7 @@ function startServer(callback) {
                         cwd: appBasePath + '/fintrack',
                         env: {
                             MICRONAUT_ENVIRONMENTS: 'h2'
-                        },
-                        shell: true
+                        }
                     });
 
             serverProcess.stdout.on('data', dataLogger);
@@ -82,22 +89,24 @@ function startServer(callback) {
 const waitForServer = function (executionCount, startHandler) {
     const requestPromise = require('minimal-request-promise');
 
-    requestPromise.get(backendUrl).then(function (response) {
-        console.log('Server started!');
-        startHandler();
-    }, function (response) {
-        if (executionCount > 5) {
-            mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
-            setTimeout(() => {
-                killHandler();
-                app.quit();
-            }, 1500);
-        } else {
-            setTimeout(() => {
-                waitForServer(executionCount + 1, startHandler);
-            }, 5000);
-        }
-    });
+    requestPromise.get(backendUrl).then(
+        response => {
+            console.log('Server started!');
+            startHandler();
+        },
+        response => {
+            if (executionCount > 5) {
+                mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
+                setTimeout(() => {
+                    killHandler();
+                    app.quit();
+                }, 1500);
+            } else {
+                setTimeout(() => {
+                    waitForServer(executionCount + 1, startHandler);
+                }, 5000);
+            }
+        });
 };
 
 function initializeApplication() {
@@ -107,13 +116,10 @@ function initializeApplication() {
         height: 786,
         autoHideMenuBar: true
     });
-    mainWindow.on('close', function(e){
-        mainWindow = null;
-        killHandler();
-    })
+    mainWindow.on('close', e => killHandler());
     mainWindow.loadFile(`${appBasePath}/resources/index.html`);
 
-    startServer(function (success, killHandler) {
+    startServer(success => {
         if (!success) {
             console.log('Was unable to start the backend server');
             mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
