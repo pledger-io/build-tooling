@@ -77,7 +77,9 @@
       {
         "from": "src/main",
         "to": "../fintrack/",
-        "filter": ["rsa-2048bit-key-pair.pem"]
+        "filter": [
+          "rsa-2048bit-key-pair.pem"
+        ]
       }
     ]
   },

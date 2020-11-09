@@ -114,7 +114,8 @@ function initializeApplication() {
         title: 'FinTrack: Personal Finance Manager',
         width: 1024,
         height: 786,
-        autoHideMenuBar: true
+        autoHideMenuBar: true,
+        center: true
     });
     mainWindow.on('close', e => killHandler());
     mainWindow.loadFile(`${appBasePath}/resources/index.html`);

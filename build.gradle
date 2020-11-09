@@ -46,7 +46,7 @@ task buildElectron (type: NpxTask) {
     dependsOn build, npmInstall
 
     command = 'electron-builder'
-    args = ["-lw"]
+    args = ["-w"]
     inputs.files('package.json', 'package-lock.json')
     inputs.dir(fileTree("node_modules").exclude(".cache"))
 }
