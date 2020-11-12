@@ -31,18 +31,18 @@ pipelines:
               - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:15-oracle --build-arg BUILD_VERSION=$version .
               - docker push gjong/amd64-fintrack:$version
         - step:
-            image: openjdk:15-windowsservercore
             name: Building Windows Application
+            image: electronuserland/builder:wine
             caches:
-              - gradle
               - node
             script:
-              - gradlew.bat buildElectron
-              - pipe: atlassian/azure-storage-deploy:0.5.2
-                variables:
-                  SOURCE: build/bundle/*.exe
-                  DESTINATION: 'https://jdocstorage.file.core.windows.net/$web/project/fintrack/'
-                  DESTINATION_SAS_TOKEN: ${AZURE_STORAGE_JDOCSTORAGE_TOKEN}
+              - npm install
+              - npx electron-builder -w
+#              - pipe: atlassian/azure-storage-deploy:0.5.2
+#                variables:
+#                  SOURCE: build/bundle/*.exe
+#                  DESTINATION: 'https://jdocstorage.file.core.windows.net/$web/project/fintrack/'
+#                  DESTINATION_SAS_TOKEN: ${AZURE_STORAGE_JDOCSTORAGE_TOKEN}
             artifacts:
               - build/bundle/*.exe
 
