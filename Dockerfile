@@ -29,6 +29,6 @@ RUN \
 # Correct the working directory
 WORKDIR /opt/fintrack
 
-CMD './runner'
+CMD ['sh', '/opt/fintrack/runner']
 
 EXPOSE 8080
