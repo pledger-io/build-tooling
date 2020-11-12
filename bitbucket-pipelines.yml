@@ -32,11 +32,11 @@ pipelines:
               - docker push gjong/amd64-fintrack:$version
         - step:
             name: Building Windows Application
+            images: electronuserland/builder:wine
             caches:
-              - gradle
               - node
             script:
-              - bash ./gradlew buildElectron
+              - npx electron-builder -wl
               - pipe: atlassian/azure-storage-deploy:0.5.2
                 variables:
                   SOURCE: build/bundle/*.exe
