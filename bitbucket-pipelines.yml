@@ -31,7 +31,6 @@ pipelines:
               - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:15-oracle --build-arg BUILD_VERSION=$version .
               - docker push gjong/amd64-fintrack:$version
         - step:
-            image: openjdk:15-windowsservercore
             name: Building Windows Application
             caches:
               - gradle
