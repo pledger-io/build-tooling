@@ -38,11 +38,11 @@ pipelines:
             script:
               - npm install
               - npx electron-builder -w
-              - pipe: atlassian/azure-storage-deploy:0.5.2
-                variables:
-                  SOURCE: build/bundle/*.exe
-                  DESTINATION: 'https://jdocstorage.file.core.windows.net/$web/project/fintrack/'
-                  DESTINATION_SAS_TOKEN: ${AZURE_STORAGE_JDOCSTORAGE_TOKEN}
+#              - pipe: atlassian/azure-storage-deploy:0.5.2
+#                variables:
+#                  SOURCE: build/bundle/*.exe
+#                  DESTINATION: 'https://jdocstorage.file.core.windows.net/$web/project/fintrack/'
+#                  DESTINATION_SAS_TOKEN: ${AZURE_STORAGE_JDOCSTORAGE_TOKEN}
             artifacts:
               - build/bundle/*.exe
 
