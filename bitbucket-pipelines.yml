@@ -36,7 +36,7 @@ pipelines:
               - gradle
               - node
             script:
-              - gradlew.bat buildElectron
+              - bash ./gradlew buildElectron
               - pipe: atlassian/azure-storage-deploy:0.5.2
                 variables:
                   SOURCE: build/bundle/*.exe
