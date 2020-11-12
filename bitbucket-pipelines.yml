@@ -36,8 +36,8 @@ pipelines:
             caches:
               - node
             script:
-              - bash npm install
-              - bash npx electron-builder -wl
+              - npm install
+              - npx electron-builder -wl
               - pipe: atlassian/azure-storage-deploy:0.5.2
                 variables:
                   SOURCE: build/bundle/*.exe
