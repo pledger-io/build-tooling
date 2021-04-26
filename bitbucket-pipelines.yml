@@ -49,7 +49,7 @@ pipelines:
             script:
               - export `grep version gradle.properties`
               - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-              - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:15-oracle --build-arg BUILD_VERSION=$version .
+              - docker build -t gjong/amd64-fintrack:$version --build-arg BASE_IMAGE=openjdk:16-oracle --build-arg BUILD_VERSION=$version .
               - docker push gjong/amd64-fintrack:$version
         - step:
             name: Building Windows Application
