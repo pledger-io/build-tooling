@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -9,12 +8,11 @@ buildscript {
 }
 
 plugins {
-    id "io.micronaut.application" version '1.3.4'
+    id "io.micronaut.application" version '1.5.0'
     id "com.github.node-gradle.node" version "2.2.4"
 }
 
 repositories {
-    jcenter()
     mavenCentral()
     maven {
         url 'https://oss.sonatype.org/service/local/repositories/releases/content'

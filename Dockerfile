@@ -1,6 +1,27 @@
 ARG BASE_IMAGE
-FROM ${BASE_IMAGE}
+FROM ${BASE_IMAGE} as builder
+ARG BUILD_VERSION
 
+RUN mkdir /opt/core-libs && mkdir /opt/fintrack
+COPY build/distributions/fintrack-*.tar /opt/fintrack.tar
+
+WORKDIR /opt
+RUN \
+    tar -xvf /opt/fintrack.tar -C /opt \
+    && mv /opt/fintrack-${BUILD_VERSION}/* /opt/fintrack/ \
+    && rm -rf /opt/fintrack-*
+
+RUN mv /opt/fintrack/lib/domain-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/bpmn-process-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/core-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/fintrack-ui-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/fintrack-api-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/jpa-repository-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/rule-engine-*.jar /opt/core-libs/
+
+
+
+FROM ${BASE_IMAGE}
 ARG BUILD_VERSION
 LABEL \
     maintainer="g.jongerius@jong-soft.com" \
@@ -12,23 +33,18 @@ VOLUME ["/opt/storage/db"]
 VOLUME ["/opt/storage/upload"]
 VOLUME ["/opt/storage/logs"]
 
+CMD ['sh', '/opt/fintrack/runner']
+EXPOSE 8080
+
 ENV JAVA_OPTS="--enable-preview -Dmicronaut.application.storage.location=/opt/storage"
 
-WORKDIR /opt
+RUN mkdir -p /opt/fintrack/bin && mkdir -p /opt/fintrack/lib
+WORKDIR /opt/fintrack
 
 # Setup application in the container
 COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
 COPY src/main/bash/runner /opt/fintrack/runner
-COPY build/distributions/fintrack-*.tar /opt/fintrack-${BUILD_VERSION}.tar
+COPY --from=builder /opt/fintrack/lib/*.jar /opt/fintrack/lib
 
-RUN \
-    tar -xf /opt/fintrack-${BUILD_VERSION}.tar \
-    && mv /opt/fintrack-${BUILD_VERSION}/* /opt/fintrack/ \
-    && rm -rf /opt/fintrack-*
-
-# Correct the working directory
-WORKDIR /opt/fintrack
-
-CMD ['sh', '/opt/fintrack/runner']
-
-EXPOSE 8080
+# Application libraries as last to reduce docker layer size
+COPY --from=builder /opt/core-libs/*.jar /opt/fintrack/lib
