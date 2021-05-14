@@ -44,7 +44,7 @@ WORKDIR /opt/fintrack
 # Setup application in the container
 COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
 COPY src/main/bash/runner /opt/fintrack/runner
-COPY --from=builder /opt/fintrack/lib/*.jar /opt/fintrack/lib
+COPY --from=builder /opt/fintrack/lib/*.jar /opt/fintrack/lib/
 
 # Application libraries as last to reduce docker layer size
-COPY --from=builder /opt/core-libs/*.jar /opt/fintrack/lib
+COPY --from=builder /opt/core-libs/*.jar /opt/fintrack/lib/
