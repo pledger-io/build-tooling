@@ -33,7 +33,6 @@ VOLUME ["/opt/storage/db"]
 VOLUME ["/opt/storage/upload"]
 VOLUME ["/opt/storage/logs"]
 
-CMD ['sh', '/opt/fintrack/runner']
 EXPOSE 8080
 
 ENV JAVA_OPTS="--enable-preview -Dmicronaut.application.storage.location=/opt/storage"
@@ -44,7 +43,10 @@ WORKDIR /opt/fintrack
 # Setup application in the container
 COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
 COPY src/main/bash/runner /opt/fintrack/runner
+COPY build/scripts/* /opt/fintrack/bin/
 COPY --from=builder /opt/fintrack/lib/*.jar /opt/fintrack/lib/
 
 # Application libraries as last to reduce docker layer size
 COPY --from=builder /opt/core-libs/*.jar /opt/fintrack/lib/
+
+CMD ['sh', '/opt/fintrack/runner']
