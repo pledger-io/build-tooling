@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE} as builder
 ARG BUILD_VERSION
 
 RUN mkdir /opt/core-libs && mkdir /opt/fintrack
-COPY build/distributions/fintrack-*.tar /opt/fintrack.tar
+COPY build/distributions/fintrack-${BUILD_VERSION}.tar /opt/fintrack.tar
 
 WORKDIR /opt
 RUN \

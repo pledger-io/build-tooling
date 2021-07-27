@@ -55,8 +55,26 @@ task buildElectron (type: NpxTask) {
     inputs.dir(fileTree("node_modules").exclude(".cache"))
 }
 
+test {
+    useJUnitPlatform()
+}
+
 // Setup the dependencies for the wrapper build
 dependencies {
     implementation "com.jongsoft.finance:fintrack-api:$apiVersion"
     implementation "com.jongsoft.finance:fintrack-ui:$angularVersion"
+
+    def jerseyVersion = '3.0.2'
+    testImplementation "org.glassfish.jersey.core:jersey-client:$jerseyVersion"
+    testImplementation "org.glassfish.jersey.media:jersey-media-json-jackson:$jerseyVersion"
+
+    def junitJupiterVersion = '5.4.2'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion"
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
+
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
+    implementation platform('org.testcontainers:testcontainers-bom:1.15.3') //import bom
+    testImplementation('org.testcontainers:testcontainers')
+    testImplementation('org.testcontainers:junit-jupiter')
 }
