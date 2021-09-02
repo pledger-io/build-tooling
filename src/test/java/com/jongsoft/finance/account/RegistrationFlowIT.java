@@ -1,47 +1,53 @@
 package com.jongsoft.finance.account;
 
 import com.jongsoft.finance.TestSetup;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
-import org.assertj.core.api.Assertions;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Map;
 
-import static com.jongsoft.finance.ResponseAssert.assertResponse;
-import static org.assertj.core.api.Assertions.assertThat;
+import static io.restassured.RestAssured.given;
 
+@DisplayName("Register user scenario's")
 class RegistrationFlowIT extends TestSetup {
 
     @Test
-    void register() throws URISyntaxException, IOException, InterruptedException {
+    @DisplayName("Create a new user account")
+    void register() throws IOException {
         final var body = super.buildBody(
                 Map.of(
                         "username", "test@pledger.io",
                         "password", "my-secret"
                 ));
 
-        assertResponse(super.put("security/create-account", body))
-                .hasStatus(201)
-                .headerSatisfies(HttpHeaders.CONTENT_LENGTH, headers -> {
-                    assertThat(headers).contains("0");
-                });
+        given()
+            .body(body)
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+        .when()
+            .put(generatePath("security/create-account"))
+        .then()
+            .statusCode(201);
     }
 
     @Test
-    void register_missingEmail() throws URISyntaxException, IOException, InterruptedException {
+    @DisplayName("Create a new user, missing e-mail address")
+    void register_missingEmail() throws IOException {
         final var body = super.buildBody(
                 Map.of(
+                        "username", "/not-a-valid-email@@",
                         "password", "my-secret"
                 ));
 
-        assertResponse(super.put("security/create-account", body))
-                .hasStatus(400)
-                .headerSatisfies(HttpHeaders.CONTENT_LENGTH, headers -> {
-                    assertThat(headers).contains("0");
-                });
+        given()
+            .body(body)
+            .contentType(ContentType.JSON)
+        .when()
+            .put(generatePath("security/create-account"))
+        .then()
+            .statusCode(400);
     }
 
 }

@@ -1,31 +1,20 @@
 package com.jongsoft.finance;
 
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
 import org.junit.jupiter.api.BeforeAll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-import org.testcontainers.utility.DockerImageName;
-import org.testcontainers.utility.MountableFile;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static org.testcontainers.utility.MountableFile.forHostPath;
 
@@ -73,28 +62,12 @@ public abstract class TestSetup {
                 applicationContainer.getMappedPort(8080));
     }
 
-    protected HttpResponse<String> post(String endPoint, String body) throws URISyntaxException, IOException, InterruptedException {
-        return exchange(endPoint, builder ->
-                builder.POST(HttpRequest.BodyPublishers.ofString(body))
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
-    }
-
-    protected HttpResponse<String> put(String endPoint, String body) throws IOException, URISyntaxException, InterruptedException {
-        return exchange(endPoint, builder ->
-                builder.PUT(HttpRequest.BodyPublishers.ofString(body))
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON));
+    protected String generatePath(String endPoint) {
+        return applicationBaseUri + endPoint;
     }
 
     protected String buildBody(Map<String, ?> body) throws JsonProcessingException {
         return objectMapper.writeValueAsString(body);
     }
 
-    private HttpResponse<String> exchange(String endPoint, Consumer<HttpRequest.Builder> builder) throws IOException, InterruptedException, URISyntaxException {
-        final var requestBuilder = HttpRequest.newBuilder(new URI(applicationBaseUri + endPoint))
-                .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
-
-        builder.accept(requestBuilder);
-
-        return httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
-    }
 }
