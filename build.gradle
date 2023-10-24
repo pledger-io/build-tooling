@@ -29,8 +29,8 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion('17')
-    targetCompatibility = JavaVersion.toVersion('17')
+    sourceCompatibility = JavaVersion.toVersion('20')
+    targetCompatibility = JavaVersion.toVersion('20')
 }
 
 // Setup the java execution process

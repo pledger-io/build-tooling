@@ -1,7 +1,7 @@
 {
-  "name": "fintrack-electron-app",
-  "version": "2.3.1",
-  "description": "FinTrack desktop application",
+  "name": "pledger-electron-app",
+  "version": "2.5.0",
+  "description": "Pledger.io desktop application",
   "main": "src/main/electron/main.js",
   "author": "JongSoft Development",
   "license": "MIT",
@@ -12,15 +12,15 @@
   },
   "build": {
     "appId": "com.jongsoft.finance",
-    "productName": "FinTrack",
-    "copyright": "Copyright 2020 JongSoft Development",
+    "productName": "Pledger.io",
+    "copyright": "Copyright 2023 JongSoft Development",
     "win": {
       "target": "nsis",
       "icon": "src/main/electron/icon.png"
     },
     "snap": {
       "confinement": "strict",
-      "summary": "FinTrack: Your personal finance management helper",
+      "summary": "Pledger.io: Your personal finance management helper",
       "grade": "stable",
       "stagePackages": [
         "opendjk-15-jre"
@@ -84,7 +84,7 @@
     ]
   },
   "devDependencies": {
-    "electron": "^10.1.5",
+    "electron": "22.3.23",
     "electron-builder": "^22.9.1"
   },
   "dependencies": {
