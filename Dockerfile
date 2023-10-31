@@ -28,6 +28,9 @@ LABEL \
     description="FinTrack ${BUILD_VERSION}, a self hosted financial application" \
     version="${BUILD_VERSION}"
 
+# Install required packages
+RUN microdnf install findutils
+
 # Expose the volumen mappings
 VOLUME ["/opt/storage/db"]
 VOLUME ["/opt/storage/upload"]
