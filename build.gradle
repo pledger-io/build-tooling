@@ -8,8 +8,7 @@ buildscript {
 }
 
 plugins {
-    id "io.micronaut.application" version '1.5.0'
-    id "com.github.node-gradle.node" version "2.2.4"
+    id 'io.micronaut.application' version '4.0.4'
 }
 
 repositories {
@@ -22,37 +21,23 @@ repositories {
     }
     maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots/'
-        mavenContent{
+        mavenContent {
             snapshotsOnly()
         }
     }
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion('20')
-    targetCompatibility = JavaVersion.toVersion('20')
+    sourceCompatibility = JavaVersion.toVersion('21')
+    targetCompatibility = JavaVersion.toVersion('21')
 }
 
-// Setup the java execution process
-mainClassName = "com.jongsoft.finance.Application"
-tasks.withType(JavaExec) {
-    classpath += configurations.developmentOnly
-    jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
+micronaut {
+    version = "4.1.2"
 }
 
-// Setup for the NPM build for standalone application
-node {
-    version = '12.18.3'
-    download = true
-}
-
-task buildElectron (type: NpxTask) {
-    dependsOn build, npmInstall
-
-    command = 'electron-builder'
-    args = ["-w"]
-    inputs.files('package.json', 'package-lock.json')
-    inputs.dir(fileTree("node_modules").exclude(".cache"))
+application {
+    mainClass = 'com.jongsoft.finance.Application'
 }
 
 // Setup the dependencies for the wrapper build

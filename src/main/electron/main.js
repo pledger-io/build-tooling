@@ -4,9 +4,8 @@ const fs = require('fs');
 const killHandler = function() {
     if (serverProcess) {
         console.debug('Attempting to terminate the Java process.')
-        if (!serverProcess.kill('SIGINT')) {
+        if (!serverProcess.kill('SIGKILL')) {
             console.warn('Could not terminate Java process, attempting forceful shutdown.');
-            console.log('Force kill response: '+ serverProcess.kill('SIGQUIT'));
             app.quit();
         } else {
             console.debug('Closing application, server terminated.')
@@ -19,7 +18,7 @@ const killHandler = function() {
 
 const appBasePath = process.cwd();
 const backendUrl = 'http://localhost:8080';
-const serverStorage = `${app.getPath('appData')}/${app.getName()}/FinTrack/storage/`;
+const serverStorage = `${app.getPath('appData')}/${app.getName()}/storage/`;
 const serverLog = app.getPath('logs') + '/server.log';
 const serverPath = `${appBasePath}/fintrack`;
 
@@ -41,22 +40,23 @@ function startServer(callback) {
     try {
         if (!fs.existsSync(serverStorage)) {
             console.debug('Server storage path was not found, creating new one.');
-            fs.mkdirSync(serverStorage);
+            fs.mkdirSync(serverStorage, {recursive: true});
         }
 
         fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${serverStorage}/rsa-2048bit-key-pair.pem`);
         fs.readdir(`${serverPath}/core/`, (err, files) => {
-            let domainJar = files.filter(file => file.indexOf('domain-') > -1)[0];
-            let versionMatch = /domain-([\w.\-]+)\.jar/.exec(domainJar)[1];
+            const loadJar = (prefix) => {
+                return files.filter(file => file.indexOf(prefix) > -1)[0];
+            }
 
             const coreJars = [
-                `${serverPath}/core/fintrack-api-${versionMatch}.jar`,
-                `${serverPath}/core/fintrack-ui-${versionMatch}.jar`,
-                `${serverPath}/core/jpa-repository-${versionMatch}.jar`,
-                `${serverPath}/core/bpmn-process-${versionMatch}.jar`,
-                `${serverPath}/core/rule-engine-${versionMatch}.jar`,
-                `${serverPath}/core/domain-${versionMatch}.jar`,
-                `${serverPath}/core/core-${versionMatch}.jar`,
+                `${serverPath}/core/${loadJar('fintrack-api-')}`,
+                `${serverPath}/core/${loadJar('fintrack-ui-')}`,
+                `${serverPath}/core/${loadJar('jpa-repository-')}`,
+                `${serverPath}/core/${loadJar('bpmn-process-')}`,
+                `${serverPath}/core/${loadJar('rule-engine-')}`,
+                `${serverPath}/core/${loadJar('domain-')}`,
+                `${serverPath}/core/${loadJar('core-')}`,
             ].join(libSeparator);
 
             console.debug('Starting backend Java server.')
@@ -111,7 +111,7 @@ const waitForServer = function (executionCount, startHandler) {
 
 function initializeApplication() {
     mainWindow = new BrowserWindow({
-        title: 'FinTrack: Personal Finance Manager',
+        title: 'Pledger.io: Personal Finance Manager',
         width: 1024,
         height: 786,
         autoHideMenuBar: true,
