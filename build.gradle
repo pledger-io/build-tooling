@@ -8,7 +8,7 @@ buildscript {
 }
 
 plugins {
-    id 'io.micronaut.application' version '4.0.4'
+    id 'io.micronaut.application' version '4.2.1'
 }
 
 repositories {
@@ -33,7 +33,7 @@ java {
 }
 
 micronaut {
-    version = "4.1.2"
+    version = "4.2.1"
 }
 
 application {
@@ -43,5 +43,5 @@ application {
 // Setup the dependencies for the wrapper build
 dependencies {
     implementation "com.jongsoft.finance:fintrack-api:$apiVersion"
-    implementation "com.jongsoft.finance:fintrack-ui:$angularVersion"
+    implementation "com.jongsoft.finance:pledger-ui:$uxVersion"
 }

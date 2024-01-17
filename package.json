@@ -1,6 +1,6 @@
 {
   "name": "pledger-electron-app",
-  "version": "2.5.0",
+  "version": "3.0.0",
   "description": "Pledger.io desktop application",
   "main": "src/main/electron/main.js",
   "author": "JongSoft Development",
@@ -23,7 +23,7 @@
       "summary": "Pledger.io: Your personal finance management helper",
       "grade": "stable",
       "stagePackages": [
-        "opendjk-15-jre"
+        "opendjk-21-jre"
       ],
       "plugs": [
         "network-bind",
@@ -44,11 +44,11 @@
     ],
     "extraFiles": [
       {
-        "from": "build/layers/libs",
+        "from": "build/install/fintrack/lib",
         "to": "./fintrack/libs",
         "filter": [
           "!fintrack-api*.jar",
-          "!fintrack-ui*.jar",
+          "!pledger-ui*.jar",
           "!rule-engine*.jar",
           "!domain*.jar",
           "!jpa-repository*.jar",
@@ -56,11 +56,11 @@
         ]
       },
       {
-        "from": "build/layers/libs",
+        "from": "build/install/fintrack/lib",
         "to": "./fintrack/core",
         "filter": [
           "fintrack-api*.jar",
-          "fintrack-ui*.jar",
+          "pledger-ui*.jar",
           "rule-engine*.jar",
           "domain*.jar",
           "jpa-repository*.jar",
@@ -84,11 +84,13 @@
     ]
   },
   "devDependencies": {
-    "electron": "22.3.23",
+    "electron": "28.1.1",
     "electron-builder": "^22.9.1"
   },
   "dependencies": {
     "minimal-request-promise": "^1.5.0",
     "tree-kill": "^1.2.2"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
+
 }

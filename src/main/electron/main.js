@@ -1,7 +1,9 @@
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, session} = require('electron');
 const fs = require('fs');
 
 const killHandler = function() {
+    session.defaultSession.clearStorageData()
+        .then(() => console.debug('Cleared session storage data.'));
     if (serverProcess) {
         console.debug('Attempting to terminate the Java process.')
         if (!serverProcess.kill('SIGKILL')) {
@@ -17,7 +19,7 @@ const killHandler = function() {
 };
 
 const appBasePath = process.cwd();
-const backendUrl = 'http://localhost:8080';
+const backendUrl = 'http://localhost:8080/';
 const serverStorage = `${app.getPath('appData')}/${app.getName()}/storage/`;
 const serverLog = app.getPath('logs') + '/server.log';
 const serverPath = `${appBasePath}/fintrack`;
@@ -51,7 +53,7 @@ function startServer(callback) {
 
             const coreJars = [
                 `${serverPath}/core/${loadJar('fintrack-api-')}`,
-                `${serverPath}/core/${loadJar('fintrack-ui-')}`,
+                `${serverPath}/core/${loadJar('pledger-ui-')}`,
                 `${serverPath}/core/${loadJar('jpa-repository-')}`,
                 `${serverPath}/core/${loadJar('bpmn-process-')}`,
                 `${serverPath}/core/${loadJar('rule-engine-')}`,
@@ -71,7 +73,8 @@ function startServer(callback) {
                     {
                         cwd: appBasePath + '/fintrack',
                         env: {
-                            MICRONAUT_ENVIRONMENTS: 'h2'
+                            MICRONAUT_ENVIRONMENTS: 'h2',
+                            MICRONAUT_SERVER_HOST: '0.0.0.0'
                         }
                     });
 
@@ -89,13 +92,23 @@ function startServer(callback) {
 const waitForServer = function (executionCount, startHandler) {
     const requestPromise = require('minimal-request-promise');
 
-    requestPromise.get(backendUrl).then(
+    console.log('Waiting for server to start on endpoint ' + backendUrl + '.');
+    const requestOptions = {
+        method: 'GET',
+        hostname: 'localhost',
+        port: 8080,
+        path: '/ui/login',
+        protocol: 'http:',
+    }
+    requestPromise(requestOptions).then(
         response => {
             console.log('Server started!');
             startHandler();
         },
         response => {
+            console.log(response.statusMessage)
             if (executionCount > 5) {
+                console.log('Server failed to start after 5 attempts.');
                 mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
                 setTimeout(() => {
                     killHandler();
@@ -126,6 +139,7 @@ function initializeApplication() {
             mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
             setTimeout(app.quit, 1000);
         } else {
+            console.log('Waiting for server to start.');
             waitForServer(
                 0,
                 () => mainWindow.loadURL(backendUrl));

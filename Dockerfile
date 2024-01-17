@@ -14,7 +14,7 @@ RUN \
 RUN mv /opt/fintrack/lib/domain-*.jar /opt/core-libs/
 RUN mv /opt/fintrack/lib/bpmn-process-*.jar /opt/core-libs/
 RUN mv /opt/fintrack/lib/core-*.jar /opt/core-libs/
-RUN mv /opt/fintrack/lib/fintrack-ui-*.jar /opt/core-libs/
+RUN mv /opt/fintrack/lib/pledger-ui-*.jar /opt/core-libs/
 RUN mv /opt/fintrack/lib/fintrack-api-*.jar /opt/core-libs/
 RUN mv /opt/fintrack/lib/jpa-repository-*.jar /opt/core-libs/
 RUN mv /opt/fintrack/lib/rule-engine-*.jar /opt/core-libs/
@@ -25,7 +25,7 @@ FROM ${BASE_IMAGE}
 ARG BUILD_VERSION
 LABEL \
     maintainer="g.jongerius@jong-soft.com" \
-    description="FinTrack ${BUILD_VERSION}, a self hosted financial application" \
+    description="Pledger ${BUILD_VERSION}, a self hosted financial application" \
     version="${BUILD_VERSION}"
 
 # Install required packages
@@ -52,4 +52,4 @@ COPY --from=builder /opt/fintrack/lib/*.jar /opt/fintrack/lib/
 # Application libraries as last to reduce docker layer size
 COPY --from=builder /opt/core-libs/*.jar /opt/fintrack/lib/
 
-CMD ['sh', '/opt/fintrack/runner']
+CMD ["/opt/fintrack/runner"]
