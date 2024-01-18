@@ -59,8 +59,8 @@ pipelines:
             caches:
               - node
             script:
-              - npm install
-              - npx electron-builder -w
+              - yarn install
+              - yarn dist -w
               - pipe: atlassian/azure-storage-deploy:1.0.2
                 variables:
                   SOURCE: build/bundle/*.exe
