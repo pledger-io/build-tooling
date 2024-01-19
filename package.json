@@ -1,6 +1,6 @@
 {
   "name": "pledger-electron-app",
-  "version": "3.1.0",
+  "version": "3.0.1",
   "description": "Pledger.io desktop application",
   "main": "src/main/electron/main.js",
   "author": "JongSoft Development",
