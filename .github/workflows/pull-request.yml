@@ -17,6 +17,7 @@ jobs:
             VERSION=$(grep version gradle.properties | cut -d= -f2)
             echo ::set-output name=version::${VERSION}-SNAPSHOT
   build:
+    needs: version
     uses: ./.github/workflows/build-artifact.yml
     with:
       version: ${{ needs.version.outputs.version }}

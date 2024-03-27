@@ -19,6 +19,7 @@ jobs:
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
           echo ::set-output name=version::${NEW_VERSION}
   build:
+    needs: version
     uses: ./.github/workflows/build-artifact.yml
     with:
       version: ${{ needs.version.outputs.version }}
