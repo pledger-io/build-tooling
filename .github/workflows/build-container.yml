@@ -12,6 +12,7 @@ jobs:
   dockerize:
     name: Build container
     runs-on: ubuntu-latest
+    if: ${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v4
       - name: Download artifact
@@ -21,6 +22,6 @@ jobs:
           path: build
       - name: Build docker image
         run: |
-          echo "Building tag: ghcr.io/pledger-io/amd64-pledger:${github.event.inputs.tag}"
-          docker build -t ghcr.io/pledger-io/amd64-pledger:${github.event.inputs.tag} --build-arg BASE_IMAGE=eclipse-temurin:21-jre-alpine --build-arg BUILD_VERSION=${github.event.inputs.tag} .
+          echo "Building tag: ghcr.io/pledger-io/amd64-pledger:${{ inputs.tag }}"
+          docker build -t ghcr.io/pledger-io/amd64-pledger:${{ inputs.tag }} --build-arg BASE_IMAGE=eclipse-temurin:21-jre-alpine --build-arg BUILD_VERSION=${{ inputs.tag }} .
           docker push ghcr.io/pledger-io/amd64-pledger:${github.event.inputs.tag}
