@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  packages: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-artifact.yml
+  dockerize:
+    needs: build
+    uses: ./.github/workflows/build-container.yml
+  native:
+    needs: build
+    uses: ./.github/workflows/build-native.yml
+  deployment:
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: native-app
+          path: build/bundle
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Upload to blob storage
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az storage blob upload-batch --overwrite --account-name ${{ secrets.AZURE_CONTAINER }} --auth-mode key -d '$web/project/fintrack/' -s build/bundle
+      - name: logout
+        run: |
+          az logout
+        if: always()

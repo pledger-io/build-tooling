@@ -1,0 +1,17 @@
+name: Verify PR
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-artifact.yml
+# This is temporary to test the building process
+  dockerize:
+    needs: build
+    uses: ./.github/workflows/build-container.yml
+  native:
+    needs: build
+    uses: ./.github/workflows/build-native.yml

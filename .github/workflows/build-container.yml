@@ -1,0 +1,21 @@
+name: Build image
+
+on: [workflow_call]
+
+jobs:
+  dockerize:
+    name: Build container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          path: build
+      - name: Build docker image
+        run: |
+          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          echo "New version: ${NEW_VERSION}"
+          docker build -t ghcr.io/pledger-io/amd64-pledger:${NEW_VERSION} --build-arg BASE_IMAGE=eclipse-temurin:21-jre-alpine --build-arg BUILD_VERSION=${NEW_VERSION} .
+          docker push ghcr.io/pledger-io/amd64-pledger:${NEW_VERSION}

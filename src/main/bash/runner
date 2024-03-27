@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Starting FinTrack application"
+echo "Starting Pledger.io application"
 
 if [[ -z "${DB_TYPE}" ]]; then
     DB_TYPE=h2
@@ -8,4 +8,4 @@ fi;
 
 JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${DB_TYPE} -Dmicronaut.server.host=0.0.0.0"
 
-/opt/fintrack/bin/fintrack
+/opt/pledger/bin/pledger-io
