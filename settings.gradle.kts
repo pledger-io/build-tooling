@@ -14,8 +14,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/pledger-io/build-tooling")
             credentials {
-                username = providers.gradleProperty("gpr.user").get() ?: System.getenv("GITHUB_ACTOR")
-                password = providers.gradleProperty("gpr.key").get() ?: System.getenv("GITHUB_TOKEN")
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
