@@ -23,7 +23,7 @@ jobs:
 # This is temporary to test the building process
   dockerize:
     needs: build
-    uses: ./.github/workftlows/build-container.yml
+    uses: ./.github/workflows/build-container.yml
     with:
       tag: ${{ needs.version.outputs.version }}
   native:
