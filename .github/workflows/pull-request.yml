@@ -14,7 +14,7 @@ jobs:
       - name: Set version
         id: set_version
         run: |
-            VERSION=$(grep version gradle.properties | cut -d= -f2)
+          VERSION=$(grep version gradle.properties | cut -d= -f2)
           echo "version=${NEW_VERSION}-SNAPSHOT" >> "$GITHUB_OUTPUT"
   build:
     needs: version
