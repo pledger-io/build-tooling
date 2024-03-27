@@ -8,11 +8,25 @@ permissions:
   packages: write
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+    steps:
+      - name: Set version
+        id: set_version
+        run: |
+          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          echo ::set-output name=version::${NEW_VERSION}
   build:
     uses: ./.github/workflows/build-artifact.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
   dockerize:
     needs: build
     uses: ./.github/workflows/build-container.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
   native:
     needs: build
     uses: ./.github/workflows/build-native.yml

@@ -6,12 +6,26 @@ on:
       - master
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+    steps:
+      - name: Set version
+        id: set_version
+        run: |
+            VERSION=$(grep version gradle.properties | cut -d= -f2)
+            echo ::set-output name=version::${VERSION}-SNAPSHOT
   build:
     uses: ./.github/workflows/build-artifact.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
 # This is temporary to test the building process
   dockerize:
     needs: build
     uses: ./.github/workflows/build-container.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
   native:
     needs: build
     uses: ./.github/workflows/build-native.yml
