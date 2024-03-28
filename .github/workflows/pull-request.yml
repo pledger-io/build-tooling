@@ -26,7 +26,7 @@ jobs:
       version: ${{ needs.version.outputs.version }}
 # This is temporary to test the building process
   dockerize:
-    needs: build
+    needs: [version, build]
     uses: ./.github/workflows/build-container.yml
     with:
-      tag: ${{ needs.version.outputs.version }}
+      version: ${{ needs.version.outputs.version }}

@@ -24,10 +24,10 @@ jobs:
     with:
       version: ${{ needs.version.outputs.version }}
   dockerize:
-    needs: build
+    needs: [version, build]
     uses: ./.github/workflows/build-container.yml
     with:
-      tag: ${{ needs.version.outputs.version }}
+      version: ${{ needs.version.outputs.version }}
   native:
     needs: build
     uses: ./.github/workflows/build-native.yml
