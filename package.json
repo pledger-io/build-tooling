@@ -13,7 +13,7 @@
   "build": {
     "appId": "com.jongsoft.finance",
     "productName": "Pledger.io",
-    "copyright": "Copyright 2023 JongSoft Development",
+    "copyright": "Copyright 2024 JongSoft Development",
     "win": {
       "target": "nsis",
       "icon": "src/main/electron/icon.png"
