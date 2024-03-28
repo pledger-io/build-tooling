@@ -15,7 +15,6 @@ jobs:
   dockerize:
     name: Build container
     runs-on: ubuntu-latest
-    if: ${{ inputs.tag }}
     steps:
       - uses: actions/checkout@v4
       - name: Download artifact
