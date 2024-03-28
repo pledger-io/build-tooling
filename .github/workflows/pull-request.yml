@@ -30,6 +30,3 @@ jobs:
     uses: ./.github/workflows/build-container.yml
     with:
       tag: ${{ needs.version.outputs.version }}
-  native:
-    needs: build
-    uses: ./.github/workflows/build-native.yml
