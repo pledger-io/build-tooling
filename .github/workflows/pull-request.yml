@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+# temporary to test the building process
+permissions:
+  packages: write
+
 jobs:
   version:
     runs-on: ubuntu-latest
