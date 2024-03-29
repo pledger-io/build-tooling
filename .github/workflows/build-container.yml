@@ -34,14 +34,25 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and push
+      - name: Build AMD64 image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           platforms: linux/amd64
           tags: |
-            ${{ env.REGISTRY }}/pledger-io/amd64-pledger:${{ inputs.version }}
+            ${{ env.REGISTRY }}/pledger-io/amd64-core:${{ inputs.version }}
+          build-args: |
+            BASE_IMAGE=eclipse-temurin:21-jre-alpine
+            BUILD_VERSION=${{ inputs.version }}
+      - name: Build ARM64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/arm64
+          tags: |
+            ${{ env.REGISTRY }}/pledger-io/arm64-core:${{ inputs.version }}
           build-args: |
             BASE_IMAGE=eclipse-temurin:21-jre-alpine
             BUILD_VERSION=${{ inputs.version }}

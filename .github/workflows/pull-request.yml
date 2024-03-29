@@ -5,10 +5,6 @@ on:
     branches:
       - master
 
-# temporary to test the building process
-permissions:
-  packages: write
-
 jobs:
   version:
     runs-on: ubuntu-latest
@@ -26,11 +22,5 @@ jobs:
   build:
     needs: version
     uses: ./.github/workflows/build-artifact.yml
-    with:
-      version: ${{ needs.version.outputs.version }}
-# This is temporary to test the building process
-  dockerize:
-    needs: [version, build]
-    uses: ./.github/workflows/build-container.yml
     with:
       version: ${{ needs.version.outputs.version }}
