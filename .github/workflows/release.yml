@@ -32,6 +32,8 @@ jobs:
   native:
     needs: build
     uses: ./.github/workflows/build-native.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
   deployment:
     needs: native
     runs-on: ubuntu-latest
