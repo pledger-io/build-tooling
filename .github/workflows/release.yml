@@ -4,9 +4,6 @@ on:
   release:
     types: [published]
 
-permissions:
-  packages: write
-
 jobs:
   version:
     runs-on: ubuntu-latest
