@@ -1,0 +1,26 @@
+name: Verify PR
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set_version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set version
+        id: set_version
+        run: |
+          VERSION=$(grep version gradle.properties | cut -d= -f2)
+          echo "Version detected is ${VERSION}"
+          echo "version=${VERSION}-SNAPSHOT" >> $GITHUB_OUTPUT
+  build:
+    needs: version
+    uses: ./.github/workflows/build-artifact.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
