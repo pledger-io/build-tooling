@@ -42,6 +42,7 @@ jobs:
           platforms: linux/amd64
           tags: |
             ${{ env.REGISTRY }}/pledger-io/amd64-core:${{ inputs.version }}
+            ${{ env.REGISTRY }}/pledger-io/amd64-core:stable
           build-args: |
             BASE_IMAGE=eclipse-temurin:21-jre-alpine
             BUILD_VERSION=${{ inputs.version }}
@@ -53,6 +54,7 @@ jobs:
           platforms: linux/arm64
           tags: |
             ${{ env.REGISTRY }}/pledger-io/arm64-core:${{ inputs.version }}
+            ${{ env.REGISTRY }}/pledger-io/arm64-core:stable
           build-args: |
             BASE_IMAGE=eclipse-temurin:21-jre-alpine
             BUILD_VERSION=${{ inputs.version }}

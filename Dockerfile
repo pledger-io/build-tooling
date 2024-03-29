@@ -5,6 +5,8 @@ ARG BUILD_VERSION
 RUN mkdir /opt/core-libs && mkdir /opt/pledger
 COPY build/install/pledger-io /opt/pledger
 
+RUN chmod +x /opt/pledger/bin/pledger-io
+
 WORKDIR /opt
 
 RUN mv /opt/pledger/lib/domain-*.jar /opt/core-libs/
