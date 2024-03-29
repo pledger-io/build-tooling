@@ -1,10 +1,17 @@
 name: Build electron
 
-on: [workflow_call]
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to build'
+        required: true
+        type: string
 
 jobs:
   native:
     name: Build for ${{ matrix.os }}
+    if: ${{ inputs.version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -22,6 +29,8 @@ jobs:
           node-version: 21.x
       - name: Install dependencies
         run: yarn --frozen-lockfile
+      - name: Set version of project
+        run: yarn version --new-version ${{ inputs.version }} --no-git-tag-version
       - name: Build native app
         run: yarn dist
         env:
