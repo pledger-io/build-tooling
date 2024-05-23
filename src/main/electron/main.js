@@ -59,6 +59,8 @@ function startServer(callback) {
                 `${serverPath}/core/${loadJar('rule-engine-')}`,
                 `${serverPath}/core/${loadJar('domain-')}`,
                 `${serverPath}/core/${loadJar('core-')}`,
+                `${serverPath}/core/${loadJar('transaction-importer-api-')}`,
+                `${serverPath}/core/${loadJar('transaction-importer-csv-')}`,
             ].join(libSeparator);
 
             console.debug('Starting backend Java server.')

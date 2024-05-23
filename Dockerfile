@@ -16,6 +16,7 @@ RUN mv /opt/pledger/lib/pledger-ui-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/fintrack-api-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/jpa-repository-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/rule-engine-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/transaction-importer-*.jar /opt/core-libs/
 
 
 FROM ${BASE_IMAGE}

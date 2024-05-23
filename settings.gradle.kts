@@ -8,14 +8,16 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    val gpr_user: String by settings
+    val gpr_token: String by settings
     @Suppress("UnstableApiUsage") // It's gradle, any of their APIs can be considered unstable
     repositories {
         mavenCentral()
         maven {
             url = uri("https://maven.pkg.github.com/pledger-io/build-tooling")
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+                username = gpr_user
+                password = gpr_token
             }
         }
     }

@@ -2,10 +2,10 @@
 
 echo "Starting Pledger.io application"
 
-if [[ -z "${DB_TYPE}" ]]; then
-    DB_TYPE=h2
-fi;
+environments="${DB_TYPE:-h2}"
 
-JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${DB_TYPE} -Dmicronaut.server.host=0.0.0.0"
+[ -n "${POSTMARK_API_TOKEN}" ] && environments="${environments},postmark"
+
+JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0"
 
 /opt/pledger/bin/pledger-io
