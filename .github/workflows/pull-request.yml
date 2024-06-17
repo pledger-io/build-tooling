@@ -1,4 +1,4 @@
-name: Verify PR
+name: Verify changes
 
 on:
   pull_request:
@@ -25,5 +25,10 @@ jobs:
   build:
     needs: version
     uses: ./.github/workflows/build-artifact.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+  native:
+    needs: [version, build]
+    uses: ./.github/workflows/build-native.yml
     with:
       version: ${{ needs.version.outputs.version }}
