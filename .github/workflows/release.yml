@@ -50,7 +50,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-            az storage blob upload-batch --overwrite --account-name ${{ secrets.AZURE_CONTAINER }} --auth-mode key -d '$web/project/fintrack/' -s build/bundle
+            az storage blob upload-batch --overwrite --account-name ${{ secrets.AZURE_CONTAINER }} --auth-mode key -d '$web/project/fintrack' -s build/bundle
       - name: logout
         run: |
           az logout
