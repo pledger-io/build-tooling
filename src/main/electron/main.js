@@ -1,100 +1,104 @@
-const {app, BrowserWindow, session} = require('electron');
+const {app, BrowserWindow} = require('electron');
 const fs = require('fs');
-
-const killHandler = function() {
-    session.defaultSession.clearStorageData()
-        .then(() => console.debug('Cleared session storage data.'));
-    if (serverProcess) {
-        console.debug('Attempting to terminate the Java process.')
-        if (!serverProcess.kill('SIGKILL')) {
-            console.warn('Could not terminate Java process, attempting forceful shutdown.');
-            app.quit();
-        } else {
-            console.debug('Closing application, server terminated.')
-            app.quit();
-        }
-    } else {
-        app.quit();
-    }
-};
-
+const console = require("node:console");
 const appBasePath = process.cwd();
-const backendUrl = 'http://localhost:8080/';
-const serverStorage = `${app.getPath('appData')}/${app.getName()}/storage/`;
-const serverLog = app.getPath('logs') + '/server.log';
-const serverPath = `${appBasePath}/fintrack`;
 
-console.log('Setting up application with known paths: ')
-console.log(`  root: ${appBasePath}`);
-console.log(`  server-storage: ${serverStorage}`);
-console.log(`  server-log: ${serverLog}`);
-console.log(`  server-path: ${serverPath}`);
-
-let window;
-let mainWindow;
-let serverProcess;
-
-function startServer(callback) {
-    const serverOutput = fs.createWriteStream(serverLog);
-    const libSeparator = process.platform === 'win32' ? ';' : ':';
-    const dataLogger = (data) => serverOutput.write(`${data}`);
-
-    try {
-        if (!fs.existsSync(serverStorage)) {
-            console.debug('Server storage path was not found, creating new one.');
-            fs.mkdirSync(serverStorage, {recursive: true});
-        }
-
-        fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${serverStorage}/rsa-2048bit-key-pair.pem`);
-        fs.readdir(`${serverPath}/core/`, (err, files) => {
-            const loadJar = (prefix) => {
-                return files.filter(file => file.indexOf(prefix) > -1)[0];
-            }
-
-            const coreJars = [
-                `${serverPath}/core/${loadJar('fintrack-api-')}`,
-                `${serverPath}/core/${loadJar('pledger-ui-')}`,
-                `${serverPath}/core/${loadJar('jpa-repository-')}`,
-                `${serverPath}/core/${loadJar('bpmn-process-')}`,
-                `${serverPath}/core/${loadJar('rule-engine-')}`,
-                `${serverPath}/core/${loadJar('domain-')}`,
-                `${serverPath}/core/${loadJar('core-')}`,
-                `${serverPath}/core/${loadJar('transaction-importer-api-')}`,
-                `${serverPath}/core/${loadJar('transaction-importer-csv-')}`,
-            ].join(libSeparator);
-
-            console.debug('Starting backend Java server.')
-            serverProcess = require('child_process')
-                .spawn('java',
-                    [
-                        '--enable-preview',
-                        '-cp', `${coreJars}${libSeparator}${serverPath}/libs/*`,
-                        `-Dmicronaut.application.storage.location=${serverStorage}`,
-                        'com.jongsoft.finance.Application'
-                    ],
-                    {
-                        cwd: appBasePath + '/fintrack',
-                        env: {
-                            MICRONAUT_ENVIRONMENTS: 'h2',
-                            MICRONAUT_SERVER_HOST: '0.0.0.0'
-                        }
-                    });
-
-            serverProcess.stdout.on('data', dataLogger);
-            serverProcess.stderr.on('data', dataLogger);
-
-            callback(serverProcess != null);
-        });
-    } catch (e) {
-        console.log(e);
-        callback(false);
+function createDirectory(directory) {
+    if (!fs.existsSync(directory)) {
+        console.debug(`Creating directory: ${directory}`);
+        fs.mkdirSync(directory, { recursive: true }) || console.error(`Failed to create directory: ${directory}`);
     }
 }
 
-const waitForServer = function (executionCount, startHandler) {
-    const requestPromise = require('minimal-request-promise');
+function BackendServer(serverPath, storagePath) {
+    let serverHandle;
+    let loggingStream;
 
-    console.log('Waiting for server to start on endpoint ' + backendUrl + '.');
+    console.debug('--------------------------------------------------');
+    console.debug('Setting up the backend server, with locations:');
+    console.debug(`  root:\t\t ${serverPath}`);
+    console.debug(`  storage:\t ${storagePath}`);
+    console.debug(`  log:\t\t ${serverPath}/logging`);
+    console.debug('--------------------------------------------------');
+
+    const prepareServer = () => {
+        try {
+            createDirectory(`${storagePath}`);
+            createDirectory(`${app.getPath('appData')}/${app.getName()}/logs`);
+            loggingStream = fs.createWriteStream(`${app.getPath('appData')}/${app.getName()}/logs/server.log`);
+            fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${storagePath}/rsa-2048bit-key-pair.pem`);
+        } catch (error) {
+            console.error(`Error preparing server: ${error}`);
+        }
+    }
+
+    const libSeparator = process.platform === 'win32' ? ';' : ':';
+    return {
+        start: function () {
+            try {
+                prepareServer();
+                serverHandle = require('child_process')
+                    .spawn('java',
+                        [
+                            '-cp', `${serverPath}/core/*${libSeparator}${serverPath}/libs/*`,
+                            `-Dmicronaut.application.storage.location=${storagePath}`,
+                            'com.jongsoft.finance.Application'
+                        ],
+                        {
+                            cwd: appBasePath + '/server',
+                            env: {
+                                MICRONAUT_ENVIRONMENTS: 'h2',
+                                MICRONAUT_SERVER_HOST: '0.0.0.0',
+                                SINGLE_USER_ENABLED: 'true',
+                            }
+                        });
+                serverHandle.stdout.on('data', (chunk) => loggingStream.write(chunk))
+                return true
+            } catch (error) {
+                return false
+            }
+        },
+        terminate: function () {
+            if (!serverHandle) {
+                console.log('Server shutdown requested, but not yet started.')
+                return
+            }
+
+            console.debug('Shutdown of backend application.')
+            if (!serverHandle.kill()) {
+                console.log('Failed to terminate the backend server gracefully.')
+            }
+        }
+    }
+}
+
+function FrontEnd(resourcePath) {
+    window = new BrowserWindow({
+        title: 'Pledger.io: Personal Finance Manager',
+        width: 1024,
+        height: 786,
+        autoHideMenuBar: true,
+        center: true,
+        icon: `${resourcePath}/icon.png`
+    })
+
+    console.debug('Starting front-end browser locations:');
+    console.debug(`  resources: ${resourcePath}`);
+    console.debug('--------------------------------------------------');
+
+    return {
+        displayApplication: () => window.loadURL('http://localhost:8080/ui/dashboard'),
+        loadingScreen: () => window.loadFile(`${resourcePath}/index.html`),
+        errorScreen: () => window.loadFile(`${resourcePath}/failed.html`),
+        onClose: (callback) => window.on('close', callback),
+    }
+}
+
+async function waitOnBackend() {
+    const requestPromise = require('minimal-request-promise');
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    console.log('Waiting for server to start.');
     const requestOptions = {
         method: 'GET',
         hostname: 'localhost',
@@ -102,62 +106,45 @@ const waitForServer = function (executionCount, startHandler) {
         path: '/ui/login',
         protocol: 'http:',
     }
-    requestPromise(requestOptions).then(
-        response => {
-            console.log('Server started!');
-            startHandler();
-        },
-        response => {
-            console.log(response.statusMessage)
-            if (executionCount > 5) {
-                console.log('Server failed to start after 5 attempts.');
-                mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
-                setTimeout(() => {
-                    killHandler();
-                    app.quit();
-                }, 1500);
-            } else {
-                setTimeout(() => {
-                    waitForServer(executionCount + 1, startHandler);
-                }, 5000);
-            }
-        });
-};
 
-function initializeApplication() {
-    mainWindow = new BrowserWindow({
-        title: 'Pledger.io: Personal Finance Manager',
-        width: 1024,
-        height: 786,
-        autoHideMenuBar: true,
-        center: true
-    });
-    mainWindow.on('close', e => killHandler());
-    mainWindow.loadFile(`${appBasePath}/resources/index.html`);
-
-    startServer(success => {
-        if (!success) {
-            console.log('Was unable to start the backend server');
-            mainWindow.loadFile(`${appBasePath}/resources/failed.html`);
-            setTimeout(app.quit, 1000);
-        } else {
-            console.log('Waiting for server to start.');
-            waitForServer(
-                0,
-                () => mainWindow.loadURL(backendUrl));
+    for (let i = 0; i < 10; i++) {
+        try {
+            const response = await requestPromise(requestOptions)
+            return response.statusCode === 200
+        } catch (error) {
+            console.debug(`Backend not yet ready after attempt ${i + 1}`);
+            await delay(5000)
         }
-    });
+    }
+
+    return false;
 }
 
-app.on('ready', initializeApplication)
+app.whenReady()
+    .then(async () => {
+        const basePath = process.cwd()
+
+        const serverControl = BackendServer(`${basePath}/server`, `${app.getPath('appData')}/${app.getName()}/storage/`)
+        const frontEndControl = FrontEnd(`${basePath}/resources`)
+
+        frontEndControl.onClose(() => serverControl.terminate())
+        frontEndControl.loadingScreen()
+
+        if (serverControl.start() && await waitOnBackend()) {
+            frontEndControl.displayApplication()
+        } else {
+            console.error('Failed to launch the server, terminating the application.')
+            frontEndControl.errorScreen()
+            setTimeout(() => {
+                serverControl.terminate()
+                app.quit()
+            }, 1500)
+        }
+    })
+
+// termination hook required for OSx
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
-    }
-});
-
-app.on('activate', () => {
-    if (window === null) {
-        initializeApplication();
     }
 });

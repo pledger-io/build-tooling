@@ -8,7 +8,8 @@
   "scripts": {
     "postinstall": "install-app-deps",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "start": "electron ."
   },
   "build": {
     "appId": "com.jongsoft.finance",
@@ -16,7 +17,7 @@
     "copyright": "Copyright 2024 JongSoft Development",
     "win": {
       "target": "nsis",
-      "icon": "src/main/electron/icon.png"
+      "icon": "src/main/electron/resources/icon.png"
     },
     "snap": {
       "confinement": "strict",
@@ -44,39 +45,44 @@
     ],
     "extraFiles": [
       {
-        "from": "build/install/fintrack/lib",
-        "to": "./fintrack/libs",
+        "from": "build/install/pledger-io/lib",
+        "to": "./server/libs",
         "filter": [
           "!fintrack-api*.jar",
           "!pledger-ui*.jar",
           "!rule-engine*.jar",
           "!domain*.jar",
           "!jpa-repository*.jar",
-          "!bpmn-process*.jar"
+          "!bpmn-process*.jar",
+          "!transaction-importer*.jar"
         ]
       },
       {
-        "from": "build/install/fintrack/lib",
-        "to": "./fintrack/core",
+        "from": "build/install/pledger-io/lib",
+        "to": "./server/core",
         "filter": [
           "fintrack-api*.jar",
           "pledger-ui*.jar",
           "rule-engine*.jar",
           "domain*.jar",
           "jpa-repository*.jar",
-          "bpmn-process*.jar"
+          "bpmn-process*.jar",
+          "transaction-importer*.jar"
         ]
       }
     ],
     "extraResources": [
       {
-        "from": "src/main/electron",
-        "to": ".",
-        "filter": "*.html"
+        "from": "src/main/electron/resources",
+        "to": "../resources/",
+        "filter": [
+          "*.html",
+          "*.png"
+        ]
       },
       {
         "from": "src/main",
-        "to": "../fintrack/",
+        "to": "../server/",
         "filter": [
           "rsa-2048bit-key-pair.pem"
         ]
@@ -84,8 +90,8 @@
     ]
   },
   "devDependencies": {
-    "electron": "28.1.1",
-    "electron-builder": "^22.9.1"
+    "electron": "33.2.0",
+    "electron-builder": "^25.1.8"
   },
   "dependencies": {
     "minimal-request-promise": "^1.5.0",
