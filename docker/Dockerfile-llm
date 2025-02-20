@@ -1,56 +1,27 @@
-ARG BASE_IMAGE
-FROM ${BASE_IMAGE} as builder
+FROM ollama/ollama:0.5.11
 ARG BUILD_VERSION
-
-RUN mkdir /opt/core-libs && mkdir /opt/pledger
-COPY build/install/pledger-io /opt/pledger
-
-RUN chmod +x /opt/pledger/bin/pledger-io
-
-WORKDIR /opt
-
-RUN mv /opt/pledger/lib/domain-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/bpmn-process-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/core-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/pledger-ui-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/fintrack-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/jpa-repository-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/learning-module-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/transaction-importer-*.jar /opt/core-libs/
-
-
-FROM ${BASE_IMAGE}
-ARG BUILD_VERSION
+ARG JDK_VERSION
 LABEL \
     maintainer="g.jongerius@jong-soft.com" \
-    description="Pledger ${BUILD_VERSION}, a self hosted financial application" \
+    description="Ollama ${BUILD_VERSION}, custom image to support LLM in Pledger.io" \
     version="${BUILD_VERSION}"
 
-# Install required packages
-#RUN microdnf install findutils
+# install the repository for eclipse JDK
+RUN apt update \
+    && apt install -y wget gpg curl \
+    && wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null \
+    && echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 
-# Expose the volumen mappings
-VOLUME ["/opt/storage/db"]
-VOLUME ["/opt/storage/upload"]
-VOLUME ["/opt/storage/logs"]
+# install the correct version of the JDK
+RUN apt update \
+    && apt install -y temurin-${JDK_VERSION}-jre \
+    && apt clean
 
-EXPOSE 8080
+ENV AI_MODEL=qwen2.5-coder:1.5b
+ENV MICRAUT_PROFILES=ai
+RUN mkdir -p /opt/scripts
+COPY src/main/llm/entrypoint.sh /opt/scripts/entrypoint
 
-ENV JAVA_OPTS="--enable-preview -Dmicronaut.application.storage.location=/opt/storage"
+ENTRYPOINT ["/opt/scripts/entrypoint"]
 
-RUN apt update && apt install -y curl \
-    && curl -fsSL https://ollama.com/install.sh | sh
-
-RUN mkdir -p /opt/pledger/bin && mkdir -p /opt/pledger/lib
-WORKDIR /opt/pledger
-
-# Setup application in the container
-COPY ../src/main/rsa-2048bit-key-pair.pem /opt/storage/
-COPY ../src/main/bash/runner /opt/pledger/runner
-COPY --from=builder /opt/pledger/bin/* /opt/pledger/bin/
-COPY --from=builder /opt/pledger/lib/*.jar /opt/pledger/lib/
-
-# Application libraries as last to reduce docker layer size
-COPY --from=builder /opt/core-libs/*.jar /opt/pledger/lib/
-
-CMD ["/opt/pledger/runner"]
+CMD ["/opt/scripts/prepare-ollama.sh"]

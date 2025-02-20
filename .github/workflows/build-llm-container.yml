@@ -1,0 +1,56 @@
+name: Build LLM Images
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Tag to build'
+        required: true
+        type: string
+
+permissions:
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  llm-build:
+    name: Build container
+    runs-on: ubuntu-latest
+    if: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build LLM AMD64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          file: docker/Dockerfile-llm
+          tags: |
+            ${{ env.REGISTRY }}/pledger-io/amd64-ollama:${{ inputs.version }}
+            ${{ env.REGISTRY }}/pledger-io/amd64-ollama:stable
+          build-args: |
+            JDK_VERSION=23
+            BUILD_VERSION=${{ inputs.version }}
+      - name: Build AMD64 image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64
+          file: docker/Dockerfile
+          tags: |
+            ${{ env.REGISTRY }}/pledger-io/amd64-embedded-llm:${{ inputs.version }}
+            ${{ env.REGISTRY }}/pledger-io/amd64-embedded-llm:stable
+          build-args: |
+            BASE_IMAGE=${{ env.REGISTRY }}/pledger-io/amd64-ollama:${{ inputs.version }}
+            BUILD_VERSION=${{ inputs.version }}

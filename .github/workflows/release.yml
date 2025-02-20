@@ -24,6 +24,11 @@ jobs:
     uses: ./.github/workflows/build-artifact.yml
     with:
       version: ${{ needs.version.outputs.version }}
+  dockerize-llm:
+    needs: [version, build]
+    uses: ./.github/workflows/build-llm-container.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
   dockerize:
     needs: [version, build]
     uses: ./.github/workflows/build-container.yml

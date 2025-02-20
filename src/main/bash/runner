@@ -5,6 +5,7 @@ echo "Starting Pledger.io application"
 environments="${DB_TYPE:-h2}"
 
 [ -n "${POSTMARK_API_TOKEN}" ] && environments="${environments},postmark"
+[ -n "${MICRAUT_PROFILES}" ] && environments="${environments},${MICRAUT_PROFILES}"
 
 JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0"
 
