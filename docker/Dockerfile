@@ -15,7 +15,7 @@ RUN mv /opt/pledger/lib/core-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/pledger-ui-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/fintrack-api-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/jpa-repository-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/rule-engine-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/learning-module-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/transaction-importer-*.jar /opt/core-libs/
 
 
@@ -42,8 +42,8 @@ RUN mkdir -p /opt/pledger/bin && mkdir -p /opt/pledger/lib
 WORKDIR /opt/pledger
 
 # Setup application in the container
-COPY src/main/rsa-2048bit-key-pair.pem /opt/storage/
-COPY src/main/bash/runner /opt/pledger/runner
+COPY ../src/main/rsa-2048bit-key-pair.pem /opt/storage/
+COPY ../src/main/bash/runner /opt/pledger/runner
 COPY --from=builder /opt/pledger/bin/* /opt/pledger/bin/
 COPY --from=builder /opt/pledger/lib/*.jar /opt/pledger/lib/
 

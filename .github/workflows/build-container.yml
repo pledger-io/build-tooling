@@ -40,11 +40,12 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64
+          file: docker/Dockerfile
           tags: |
             ${{ env.REGISTRY }}/pledger-io/amd64-core:${{ inputs.version }}
             ${{ env.REGISTRY }}/pledger-io/amd64-core:stable
           build-args: |
-            BASE_IMAGE=eclipse-temurin:21-jre-alpine
+            BASE_IMAGE=eclipse-temurin:23-jre-alpine
             BUILD_VERSION=${{ inputs.version }}
       - name: Build ARM64 image
         uses: docker/build-push-action@v5
@@ -52,9 +53,10 @@ jobs:
           context: .
           push: true
           platforms: linux/arm64
+          file: docker/Dockerfile
           tags: |
             ${{ env.REGISTRY }}/pledger-io/arm64-core:${{ inputs.version }}
             ${{ env.REGISTRY }}/pledger-io/arm64-core:stable
           build-args: |
-            BASE_IMAGE=eclipse-temurin:21-jre-alpine
+            BASE_IMAGE=eclipse-temurin:23-jre-alpine
             BUILD_VERSION=${{ inputs.version }}
