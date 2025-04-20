@@ -32,3 +32,18 @@ jobs:
     uses: ./.github/workflows/build-native.yml
     with:
       version: ${{ needs.version.outputs.version }}
+  deployment:
+    needs: native
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: native-app
+          path: build/bundle
+      - uses: bacongobbler/azure-blob-storage-upload@main
+        with:
+          source_dir: build/bundle
+          container_name: www
+          connection_string: ${{ secrets.AZURE_CREDENTIALS }}
+          extra_args: '--pattern *.exe'
