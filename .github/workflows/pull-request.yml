@@ -44,6 +44,6 @@ jobs:
       - uses: bacongobbler/azure-blob-storage-upload@main
         with:
           source_dir: build/bundle
-          container_name: $www
+          container_name: $web
           connection_string: ${{ secrets.AZURE_CREDENTIALS }}
           extra_args: '--pattern *.exe'
