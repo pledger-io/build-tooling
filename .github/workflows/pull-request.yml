@@ -41,9 +41,3 @@ jobs:
         with:
           name: native-app
           path: build/bundle
-      - uses: bacongobbler/azure-blob-storage-upload@main
-        with:
-          source_dir: build/bundle
-          container_name: $web
-          connection_string: ${{ secrets.AZURE_CREDENTIALS }}
-          extra_args: '--pattern *.exe'

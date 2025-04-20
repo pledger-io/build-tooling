@@ -48,15 +48,9 @@ jobs:
         with:
           name: native-app
           path: build/bundle
-      - uses: azure/login@v1
+      - uses: bacongobbler/azure-blob-storage-upload@main
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Upload to blob storage
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az storage blob upload-batch --overwrite --account-name ${{ secrets.AZURE_CONTAINER }} --auth-mode key -d '$web/project/fintrack' -s build/bundle
-      - name: logout
-        run: |
-          az logout
-        if: always()
+          source_dir: build/bundle
+          container_name: $web
+          connection_string: ${{ secrets.AZURE_CREDENTIALS }}
+          extra_args: '--pattern *.exe'
