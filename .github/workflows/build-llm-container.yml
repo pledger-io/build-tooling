@@ -44,7 +44,7 @@ jobs:
             ${{ env.REGISTRY }}/pledger-io/amd64-ollama:${{ inputs.version }}
             ${{ env.REGISTRY }}/pledger-io/amd64-ollama:stable
           build-args: |
-            JDK_VERSION=23
+            JDK_VERSION=24
             BUILD_VERSION=${{ inputs.version }}
       - name: Build AMD64 image
         uses: docker/build-push-action@v5

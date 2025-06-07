@@ -45,7 +45,7 @@ jobs:
             ${{ env.REGISTRY }}/pledger-io/amd64-core:${{ inputs.version }}
             ${{ env.REGISTRY }}/pledger-io/amd64-core:stable
           build-args: |
-            BASE_IMAGE=eclipse-temurin:23-jre-noble
+            BASE_IMAGE=eclipse-temurin:24-jre-noble
             BUILD_VERSION=${{ inputs.version }}
       - name: Build ARM64 image
         uses: docker/build-push-action@v5
@@ -58,5 +58,5 @@ jobs:
             ${{ env.REGISTRY }}/pledger-io/arm64-core:${{ inputs.version }}
             ${{ env.REGISTRY }}/pledger-io/arm64-core:stable
           build-args: |
-            BASE_IMAGE=eclipse-temurin:23-jre-noble
+            BASE_IMAGE=eclipse-temurin:24-jre-noble
             BUILD_VERSION=${{ inputs.version }}

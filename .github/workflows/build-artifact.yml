@@ -19,7 +19,7 @@ jobs:
       - name: Configure Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '23'
+          java-version: '24'
           distribution: 'temurin'
           architecture: x64
       - name: Setup Gradle
