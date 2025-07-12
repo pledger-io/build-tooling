@@ -4,6 +4,7 @@ echo "Starting Pledger.io application"
 
 environments="${DB_TYPE:-h2}"
 
+[ -n "${OPENID_URI}" ] && environments="${environments},openid"
 [ -n "${POSTMARK_API_TOKEN}" ] && environments="${environments},postmark"
 [ -n "${MICRAUT_PROFILES}" ] && environments="${environments},${MICRAUT_PROFILES}"
 
