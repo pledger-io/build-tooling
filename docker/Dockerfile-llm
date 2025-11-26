@@ -1,4 +1,4 @@
-FROM ollama/ollama:0.5.11
+FROM ollama/ollama:0.13.0
 ARG BUILD_VERSION
 ARG JDK_VERSION
 LABEL \
