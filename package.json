@@ -48,7 +48,13 @@
         "from": "build/install/pledger-io/lib",
         "to": "./server/libs",
         "filter": [
-          "!fintrack-api*.jar",
+          "!application*.jar",
+          "!rest-api*.jar",
+          "!budget-api*.jar",
+          "!importer-api*.jar",
+          "!learning-rule-api*.jar",
+          "!runtime-api*.jar",
+          "!system-api*.jar",
           "!pledger-ui*.jar",
           "!rule-engine*.jar",
           "!domain*.jar",
@@ -61,7 +67,13 @@
         "from": "build/install/pledger-io/lib",
         "to": "./server/core",
         "filter": [
-          "fintrack-api*.jar",
+          "application*.jar",
+          "rest-api*.jar",
+          "budget-api*.jar",
+          "importer-api*.jar",
+          "learning-rule-api*.jar",
+          "runtime-api*.jar",
+          "system-api*.jar",
           "pledger-ui*.jar",
           "rule-engine*.jar",
           "domain*.jar",
@@ -90,8 +102,8 @@
     ]
   },
   "devDependencies": {
-    "electron": "33.2.0",
-    "electron-builder": "^25.1.8"
+    "electron": "37.10.3",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "minimal-request-promise": "^1.5.0",
