@@ -2,12 +2,12 @@
 
 echo "Starting Pledger.io application"
 
-environments="${DB_TYPE:-h2}"
+environments="${DB_TYPE:-h2},jpa"
 
 [ -n "${OPENID_URI}" ] && environments="${environments},openid"
 [ -n "${POSTMARK_API_TOKEN}" ] && environments="${environments},postmark"
 [ -n "${MICRAUT_PROFILES}" ] && environments="${environments},${MICRAUT_PROFILES}"
 
-JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0"
+JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0 -Dmicronaut.application.storage.location=/opt/storage"
 
 /opt/pledger/bin/pledger-io

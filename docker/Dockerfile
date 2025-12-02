@@ -13,10 +13,17 @@ RUN mv /opt/pledger/lib/domain-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/bpmn-process-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/core-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/pledger-ui-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/fintrack-api-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/jpa-repository-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/learning-module-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/transaction-importer-*.jar /opt/core-libs/
+# API jars
+RUN mv /opt/pledger/lib/application-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/rest-api-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/budget-api-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/importer-api-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/learning-rule-api-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/runtime-api-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/system-api-*.jar /opt/core-libs/
 
 
 FROM ${BASE_IMAGE}
