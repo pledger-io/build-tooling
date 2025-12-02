@@ -24,8 +24,8 @@ function BackendServer(serverPath, storagePath) {
     const prepareServer = () => {
         try {
             createDirectory(`${storagePath}`);
-            createDirectory(`${app.getPath('appData')}/${app.getName()}/logs`);
-            loggingStream = fs.createWriteStream(`${app.getPath('appData')}/${app.getName()}/logs/server.log`);
+            createDirectory(`${storagePath}/logs`);
+            loggingStream = fs.createWriteStream(`${storagePath}/logs/server.log`);
             fs.copyFileSync(`${serverPath}/rsa-2048bit-key-pair.pem`, `${storagePath}/rsa-2048bit-key-pair.pem`);
         } catch (error) {
             console.error(`Error preparing server: ${error}`);
@@ -42,17 +42,18 @@ function BackendServer(serverPath, storagePath) {
                         [
                             '-cp', `${serverPath}/core/*${libSeparator}${serverPath}/libs/*`,
                             `-Dmicronaut.application.storage.location=${storagePath}`,
-                            'com.jongsoft.finance.Application'
+                            'com.jongsoft.finance.Pledger'
                         ],
                         {
                             cwd: appBasePath + '/server',
                             env: {
-                                MICRONAUT_ENVIRONMENTS: 'h2',
+                                MICRONAUT_ENVIRONMENTS: 'h2,jpa',
                                 MICRONAUT_SERVER_HOST: '0.0.0.0',
                                 SINGLE_USER_ENABLED: 'true',
                             }
                         });
                 serverHandle.stdout.on('data', (chunk) => loggingStream.write(chunk))
+                serverHandle.stderr.on('data', (chunk) => loggingStream.write(chunk))
                 return true
             } catch (error) {
                 return false
@@ -66,8 +67,9 @@ function BackendServer(serverPath, storagePath) {
 
             console.debug('Shutdown of backend application.')
             if (!serverHandle.kill()) {
-                console.log('Failed to terminate the backend server gracefully.')
+                console.warn('Failed to terminate the backend server gracefully.')
             }
+            console.debug('Backend server terminated.')
         }
     }
 }
@@ -75,8 +77,8 @@ function BackendServer(serverPath, storagePath) {
 function FrontEnd(resourcePath) {
     window = new BrowserWindow({
         title: 'Pledger.io: Personal Finance Manager',
-        width: 1024,
-        height: 786,
+        width: 1300,
+        height: 900,
         autoHideMenuBar: true,
         center: true,
         icon: `${resourcePath}/icon.png`
