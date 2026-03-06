@@ -28,6 +28,7 @@ LABEL \
 VOLUME ["/opt/storage/db"]
 VOLUME ["/opt/storage/upload"]
 VOLUME ["/opt/storage/logs"]
+VOLUME ["/opt/storage/vector_stores"]
 
 EXPOSE 8080
 
