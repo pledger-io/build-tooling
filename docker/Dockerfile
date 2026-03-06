@@ -3,27 +3,15 @@ FROM ${BASE_IMAGE} as builder
 ARG BUILD_VERSION
 
 RUN mkdir /opt/core-libs && mkdir /opt/pledger
-COPY build/install/pledger-io /opt/pledger
+COPY build/install/pledger-application /opt/pledger
 
+RUN mv /opt/pledger/bin/pledger-application /opt/pledger/bin/pledger-io
 RUN chmod +x /opt/pledger/bin/pledger-io
 
 WORKDIR /opt
 
-RUN mv /opt/pledger/lib/domain-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/bpmn-process-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/core-*.jar /opt/core-libs/
+RUN mv /opt/pledger/lib/pledger-io-*.jar /opt/core-libs/
 RUN mv /opt/pledger/lib/pledger-ui-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/jpa-repository-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/learning-module-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/transaction-importer-*.jar /opt/core-libs/
-# API jars
-RUN mv /opt/pledger/lib/application-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/rest-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/budget-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/importer-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/learning-rule-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/runtime-api-*.jar /opt/core-libs/
-RUN mv /opt/pledger/lib/system-api-*.jar /opt/core-libs/
 
 
 FROM ${BASE_IMAGE}

@@ -1,4 +1,4 @@
-rootProject.name = "pledger-io"
+rootProject.name = "pledger-application"
 
 pluginManagement {
     plugins {
@@ -28,7 +28,7 @@ dependencyResolutionManagement {
             val apiVersion: String by settings
             val uxVersion: String by settings
 
-            library("api", "com.jongsoft.finance", "application").version(apiVersion)
+            library("api", "com.jongsoft.finance", "pledger-io").version(apiVersion)
             library("ux", "com.jongsoft.finance", "pledger-ui").version(uxVersion)
         }
     }
