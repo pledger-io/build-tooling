@@ -10,5 +10,11 @@
     }
   ],
   "addLabels": ["dependency"],
-  "assignees": ["@gjong"]
+  "assignees": ["@gjong"],
+  "hostRules": [
+    {
+      "matchHost": "github.com",
+      "token": "{{ secrets.GITHUB_REPO_ACCESS }}"
+    }
+  ]
 }
