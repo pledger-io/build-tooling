@@ -30,7 +30,7 @@ jobs:
           ORG_GRADLE_PROJECT_gpr_user: ${{ env.GITHUB_ACTOR }}
           ORG_GRADLE_PROJECT_gpr_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-artifact
           path: |
