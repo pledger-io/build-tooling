@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           architecture: x64
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@39bfbcf1a94523e6d06f556c316ea9e8e69ecb82
+        uses: gradle/actions/setup-gradle@03ee1e1693f571d64506b3ed4cdf120520300ff2
       - name: Build artifact
         run: ./gradlew build installDist -Pversion=${{ inputs.version }}
         env:
