@@ -1,0 +1,8 @@
+[
+  {
+    "name": "com.jongsoft.finance.core.domain.jpa.DefaultNamingStrategy",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  }
+]

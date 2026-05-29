@@ -4,6 +4,7 @@ pluginManagement {
     plugins {
         id("java")
         id("io.micronaut.application").version("4.6.2")
+        id("org.graalvm.buildtools.native").version("0.10.6")
     }
 }
 

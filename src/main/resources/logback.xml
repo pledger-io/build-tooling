@@ -1,0 +1,20 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>false</withJansi>
+        <encoder>
+            <pattern>%magenta(%d{yyyy-MM-dd}) %cyan(%d{HH:mm:ss.SSS}) %green(%-36X{correlationId}) %highlight(%-5level) %gray([%thread])  %magenta(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.jongsoft.finance" level="info" />
+    <logger name="com.jongsoft.finance.jpa" level="info" />
+    <logger name="com.jongsoft.finance.bpmn.delegate" level="info" />
+    <logger name="com.jongsoft.finance.filter" level="info" />
+    <logger name="com.jongsoft.finance.spending" level="trace" />
+    <!-- GraalVM native: Flyway's classpath scanner cannot read resource: URLs; migrations still run via Micronaut -->
+    <logger name="org.flywaydb.core.internal.scanner" level="error" />
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
