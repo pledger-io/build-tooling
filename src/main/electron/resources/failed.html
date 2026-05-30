@@ -1,37 +1,193 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pledger.io — Backend unavailable</title>
     <style>
-        #loader-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1000;
-            background: #222;
-        }
-        #loading-text {
-            color: white;
-            text-align: center;
-            height: 100vh;
-            z-index: 1001;
-            position: fixed;
-            left: 0;
-            right: 0;
-            top: 0;
+        :root {
+            color-scheme: dark;
+            --bg: #1a1d24;
+            --panel: #252932;
+            --text: #eef1f6;
+            --muted: #9aa3b2;
+            --accent: #e74c3c;
+            --button: #3498db;
+            --button-hover: #2980b9;
         }
 
-        #loading-text p {
-            font-size: 22px;
-            line-height: 100vh;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: radial-gradient(circle at top, #2c3340 0%, var(--bg) 55%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            width: min(560px, 100%);
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 32px;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+        }
+
+        .icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0 0 12px;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 0 0 14px;
+            line-height: 1.55;
+            color: var(--muted);
+        }
+
+        .detail {
+            margin: 18px 0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.22);
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 13px;
+            color: #d7dde8;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        button.primary {
+            background: var(--button);
+            color: white;
+        }
+
+        button.primary:hover {
+            background: var(--button-hover);
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text);
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .log-hint {
+            margin-top: 18px;
+            font-size: 12px;
+            color: var(--muted);
         }
     </style>
 </head>
 <body>
-
-    <div id="loader-wrapper">
-        <div id="loading-text"><p>Failed to load application. This window will close automatically.</p></div>
+    <div class="card">
+        <div class="icon">!</div>
+        <h1 id="title">Backend unavailable</h1>
+        <p id="message">The Pledger.io server stopped unexpectedly. Your data is stored locally, but the application cannot run until the server is restarted.</p>
+        <div id="detail" class="detail" hidden></div>
+        <div class="actions">
+            <button id="restart" class="primary" type="button">Restart server</button>
+            <button id="quit" class="secondary" type="button">Quit application</button>
+        </div>
+        <p id="log-hint" class="log-hint"></p>
     </div>
 
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const reason = params.get('reason') || 'unknown';
+        const exitCode = params.get('exitCode');
+        const signal = params.get('signal');
+
+        const titles = {
+            startup: 'Failed to start server',
+            crash: 'Server stopped unexpectedly',
+            health: 'Server is not responding',
+            missing: 'Server executable not found',
+        };
+
+        const messages = {
+            startup: 'Pledger.io could not start its local server. Check that the application was installed correctly and try again.',
+            crash: 'The local server stopped while the application was running. This can happen after an internal error. Try restarting the server.',
+            health: 'The local server is no longer responding. It may have crashed or become stuck. Try restarting the server.',
+            missing: 'The Pledger.io server executable was not found. Reinstall the application or rebuild the native backend for development.',
+        };
+
+        document.getElementById('title').textContent = titles[reason] || titles.crash;
+        document.getElementById('message').textContent = messages[reason] || messages.crash;
+
+        const detailParts = [];
+        if (exitCode !== null && exitCode !== '') {
+            detailParts.push(`Exit code: ${exitCode}`);
+        }
+        if (signal) {
+            detailParts.push(`Signal: ${signal}`);
+        }
+        if (detailParts.length > 0) {
+            const detail = document.getElementById('detail');
+            detail.hidden = false;
+            detail.textContent = detailParts.join(' · ');
+        }
+
+        if (window.desktop?.getLogPath) {
+            window.desktop.getLogPath().then((logPath) => {
+                if (logPath) {
+                    document.getElementById('log-hint').textContent = `Server log: ${logPath}`;
+                }
+            }).catch(() => {});
+        }
+
+        document.getElementById('quit').addEventListener('click', () => {
+            if (window.desktop?.quit) {
+                window.desktop.quit();
+            }
+        });
+
+        document.getElementById('restart').addEventListener('click', () => {
+            if (window.desktop?.restart) {
+                window.desktop.restart();
+            }
+        });
+    </script>
 </body>
 </html>

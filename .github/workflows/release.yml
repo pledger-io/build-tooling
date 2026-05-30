@@ -35,7 +35,7 @@ jobs:
     with:
       version: ${{ needs.version.outputs.version }}
   native:
-    needs: [version, build]
+    needs: version
     uses: ./.github/workflows/build-native.yml
     with:
       version: ${{ needs.version.outputs.version }}

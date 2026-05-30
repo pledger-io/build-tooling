@@ -18,20 +18,29 @@ jobs:
         os: [ windows-latest ]
     steps:
       - uses: actions/checkout@v6
-      - name: Download artifact
-        uses: actions/download-artifact@v8
+      - name: Configure GraalVM
+        uses: actions/setup-java@v5
         with:
-          name: build-artifact
-          path: build
-      - name: Set Node.js 22.x
+          java-version: '25'
+          distribution: 'graalvm'
+          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@11d4d83c63a6ce61b32d8a9c4faddbdb04fe9917
+      - name: Compile native backend
+        run: ./gradlew nativeCompile
+        env:
+          ORG_GRADLE_PROJECT_gpr_user: ${{ github.actor }}
+          ORG_GRADLE_PROJECT_gpr_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24.x
+          cache: yarn
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Set version of project
         run: yarn version --new-version ${{ inputs.version }} --no-git-tag-version
-      - name: Build native app
+      - name: Build desktop installer
         run: yarn dist
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -38,6 +38,11 @@ graalvmNative {
                     "-H:+AllowDeprecatedBuilderClassesOnImageClasspath",
                     "--initialize-at-build-time=io.micronaut.flyway.StaticResourceProvider",
                     "--initialize-at-build-time=io.micronaut.flyway.StaticResourceProvider\$StaticLoadableResource",
+                    // JNI/native libs must initialize at runtime (ONNX + Hugging Face tokenizers)
+                    "--initialize-at-run-time=ai.onnxruntime",
+                    "--initialize-at-run-time=ai.djl.huggingface.tokenizers",
+                    "--initialize-at-run-time=ai.djl.util.Platform",
+                    "--initialize-at-run-time=dev.langchain4j.model.embedding.onnx",
                     // Must match flyway.datasources.default.locations (see src/main/resources/application-h2.properties)
                     "-Dflyway.locations=classpath:db/migration/mysql",
                 ),
@@ -67,15 +72,6 @@ graalvmNative {
             )
         }
     }
-}
-
-tasks.named<NativeImageDockerfile>("dockerfileNative") {
-    jdkVersion.set("25")
-    args(
-        "-Dmicronaut.environments=h2,jpa",
-        "-Dmicronaut.application.storage.location=/opt/storage",
-        "-Dmicronaut.server.host=0.0.0.0",
-    )
 }
 
 dependencies {
@@ -146,3 +142,13 @@ tasks.named("nativeRun").configure {
 tasks.matching { it.name.equals("dockerBuildNative", ignoreCase = true) }.configureEach {
     dependsOn(copyNativeRuntimeLibraries)
 }
+
+val desktopDist =
+    tasks.register<Exec>("desktopDist") {
+        group = "distribution"
+        description = "Builds the Windows desktop installer (native backend + Electron shell)"
+        dependsOn("nativeCompile")
+        workingDir = layout.projectDirectory.asFile
+        val yarn = if (OperatingSystem.current().isWindows()) "yarn.cmd" else "yarn"
+        commandLine(yarn, "dist")
+    }
