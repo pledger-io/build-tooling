@@ -826,10 +826,10 @@ electron-publish@26.8.1:
     lazy-val "^1.0.5"
     mime "^2.5.2"
 
-electron@42.1.0:
-  version "42.1.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-42.1.0.tgz#e0ba4ee476c5620e0f0f6eed6fb039eafe6b7625"
-  integrity sha512-0szNwC/0dWtkvNce5j3ThiuL0TxBNrZN/BZhdOiGwbLreiD/+u3MGpkct4hA5Ycagb8MXjpEr5/oosi+FwuKRQ==
+electron@42.3.2:
+  version "42.3.2"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-42.3.2.tgz#5b0fe7955f612d017a40328c298b372372b2d0c8"
+  integrity sha512-R8qL6TMQ+u5r/l1mL6zWqqK3eQo6Bqi4ScmysgODcy+SNR76HQhvbZUEL/9GqNuF0fNFJxphz/bh/TC4jW8NbA==
   dependencies:
     "@electron/get" "^5.0.0"
     "@types/node" "^24.9.0"
