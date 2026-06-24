@@ -88,5 +88,13 @@
     "allDeclaredConstructors": true,
     "allPublicMethods": true,
     "allDeclaredMethods": true
+  },
+  {
+    "name": "com.jongsoft.finance.exporter.domain.service.transaction.ImportContext",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true
   }
 ]

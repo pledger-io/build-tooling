@@ -53,6 +53,7 @@ graalvmNative {
                 includedPatterns.add("application.*\\.yaml")
                 includedPatterns.add("application.*\\.yml")
                 includedPatterns.add("logback\\.xml")
+                includedPatterns.add("micronaut-banner\\.txt")
                 includedPatterns.add("docs/.*")
                 includedPatterns.add("db/.*")
                 includedPatterns.add("public/.*")
@@ -65,6 +66,7 @@ graalvmNative {
             }
             runtimeArgs.addAll(
                 listOf(
+                    "--enable-native-access=ALL-UNNAMED",
                     "-Dmicronaut.environments=h2,jpa,demo",
                     "-Dmicronaut.server.host=0.0.0.0",
                     "-Dmicronaut.application.storage.location=${layout.buildDirectory.get().asFile}/native-run",

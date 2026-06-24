@@ -41,5 +41,55 @@
       {"name": "getStart", "parameterTypes": []},
       {"name": "getEnd", "parameterTypes": []}
     ]
+  },
+  {
+    "name": "ai.onnxruntime.OrtEnvironment",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OrtSession",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OrtSession$SessionOptions",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OrtSession$Result",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OnnxTensor",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OnnxValue",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.TensorInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.NodeInfo",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OrtAllocator",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "ai.onnxruntime.OrtException",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
   }
 ]
