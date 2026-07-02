@@ -3,7 +3,7 @@ rootProject.name = "pledger-application"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.application").version("5.0.1")
+        id("io.micronaut.application").version("5.0.2")
     }
 }
 
