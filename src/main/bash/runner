@@ -2,12 +2,26 @@
 
 echo "Starting Pledger.io application"
 
+storage="${MICRONAUT_APPLICATION_STORAGE_LOCATION:-/opt/storage}"
+key_file="${storage}/rsa-2048bit-key-pair.pem"
+
+if [ ! -f "${key_file}" ]; then
+  if ! command -v openssl >/dev/null 2>&1; then
+    echo "Missing ${key_file} and openssl is not available to generate it"
+    exit 1
+  fi
+  echo "Generating ${key_file} for JWT signing"
+  openssl genrsa -out "${key_file}" 2048
+  chmod 600 "${key_file}"
+fi
+
+# Setup initial environment
 environments="${DB_TYPE:-h2},jpa"
 
 [ -n "${OPENID_URI}" ] && environments="${environments},openid"
 [ -n "${POSTMARK_API_TOKEN}" ] && environments="${environments},postmark"
 [ -n "${MICRONAUT_PROFILES}" ] && environments="${environments},${MICRONAUT_PROFILES}"
 
-JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0 -Dmicronaut.application.storage.location=/opt/storage"
+JAVA_OPTS="$JAVA_OPTS -Dmicronaut.environments=${environments} -Dmicronaut.server.host=0.0.0.0 -Dmicronaut.application.storage.location=${storage}"
 
 /opt/pledger/bin/pledger-io

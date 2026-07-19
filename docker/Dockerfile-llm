@@ -23,5 +23,3 @@ RUN mkdir -p /opt/scripts
 COPY src/main/llm/entrypoint.sh /opt/scripts/entrypoint
 
 ENTRYPOINT ["/opt/scripts/entrypoint"]
-
-CMD ["/opt/scripts/prepare-ollama.sh"]
