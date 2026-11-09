@@ -8,7 +8,7 @@ java {
 }
 
 micronaut {
-    version = "5.2.4"
+    version = "5.2.5"
     runtime("jetty")
 }
 
